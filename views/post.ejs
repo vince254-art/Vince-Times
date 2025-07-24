@@ -1,0 +1,118 @@
+<%- include('partials/head', { title: post.title }) %>
+<%- include('partials/header') %>
+
+<main class="max-w-3xl mx-auto px-4 py-10 space-y-10 fade-in">
+  <h1 class="text-4xl font-bold text-blue-800 dark:text-blue-300"><%= post.title %></h1>
+
+  <!-- Metadata -->
+  <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-300">
+    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-semibold"><%= post.category %></span>
+    <% if (post.date) { %><span><%= new Date(post.date).toLocaleString() %></span><% } %>
+  </div>
+
+  <!-- Media -->
+  <% if (post.media) { %>
+    <div class="w-full rounded overflow-hidden shadow">
+      <img src="<%= post.media %>" alt="<%= post.title %>" class="w-full max-h-[300px] object-cover" />
+    </div>
+  <% } %>
+
+  <% if (post.videoUrl) { %>
+    <div class="aspect-w-16 aspect-h-9 mt-6">
+      <iframe class="w-full h-96 rounded-lg" src="<%= post.videoUrl %>" frameborder="0" allowfullscreen></iframe>
+    </div>
+  <% } %>
+
+  <!-- Post Content -->
+  <article class="prose lg:prose-lg dark:prose-invert max-w-none text-gray-800 dark:text-gray-100">
+    <%- post.content %>
+  </article>
+
+  <!-- Comments -->
+  <section id="comments" class="comments-section">
+    <h2 class="section-heading">💬 Comments</h2>
+
+    <% if (post.comments && post.comments.length > 0) { %>
+      <% post.comments.forEach(comment => { %>
+        <div class="comment">
+          <div class="comment-header">
+            <span class="comment-author"><%= comment.name %></span>
+            <% if (comment.flagged) { %>
+              <span class="flagged">🚩 Flagged</span>
+            <% } %>
+          </div>
+          <div class="comment-text" id="comment-<%= comment.id %>"></div>
+          <div class="flex gap-2 text-xl">
+            <button class="emoji-btn">👍</button>
+            <button class="emoji-btn">😂</button>
+            <button class="emoji-btn">😮</button>
+            <button class="emoji-btn">❤️</button>
+          </div>
+          <div class="mt-2 flex items-center gap-2">
+            <button class="upvote-btn bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700 transition"
+                    data-post-id="<%= post.id %>" data-comment-id="<%= comment.id %>">⬆ Upvote</button>
+            <span class="text-xs text-gray-700 dark:text-gray-300">
+              <%= comment.upvotes || 0 %> upvote<%= (comment.upvotes || 0) === 1 ? '' : 's' %>
+            </span>
+          </div>
+          <script>
+            const rawText_<%= comment.id %> = `<%= comment.comment.replace(/`/g, '\`') %>`;
+            document.querySelector('#comment-<%= comment.id %>').innerHTML =
+              DOMPurify.sanitize(marked.parse(rawText_<%= comment.id %>));
+          </script>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p class="text-gray-500 dark:text-gray-400 italic">No comments yet. Be the first to share your thoughts!</p>
+    <% } %>
+
+    <form action="/post/<%= post.id %>/comment" method="POST" class="comment-form">
+      <div class="form-group">
+        <label for="author">👤 Your Name</label>
+        <input type="text" name="author" id="author" required placeholder="e.g. VinceRadio">
+      </div>
+      <div class="form-group">
+        <label for="wysiwyg">💬 Your Comment</label>
+        <textarea name="text" id="wysiwyg" required placeholder="Write in **Markdown**..." rows="5"></textarea>
+      </div>
+      <button type="submit" class="submit-btn">➕ Add Comment</button>
+    </form>
+
+    <div class="preview-box">
+      <h3>🔎 Live Preview</h3>
+      <div id="commentPreview" class="comment-preview"></div>
+    </div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+<script>
+  const input = document.getElementById('wysiwyg');
+  const preview = document.getElementById('commentPreview');
+
+  input?.addEventListener('input', () => {
+    const raw = input.value;
+    preview.innerHTML = DOMPurify.sanitize(marked.parse(raw));
+  });
+
+  document.querySelectorAll('.upvote-btn').forEach(button => {
+    button.addEventListener('click', async () => {
+      const postId = button.dataset.postId;
+      const commentId = button.dataset.commentId;
+
+      try {
+        const res = await fetch(`/post/${postId}/comment/${commentId}/upvote`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          const countSpan = button.nextElementSibling;
+          countSpan.textContent = `${data.upvotes} upvote${data.upvotes === 1 ? '' : 's'}`;
+        }
+      } catch (err) {
+        console.error('Upvote failed:', err);
+      }
+    });
+  });
+</script>
+
+<%- include('partials/footer') %>

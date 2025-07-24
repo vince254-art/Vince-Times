@@ -1,0 +1,81 @@
+
+<%- include('partials/head', { title: 'Comment Moderation' }) %>
+<%- include('partials/header', { loggedIn }) %>
+
+<main class="max-w-5xl mx-auto px-4 py-10">
+  <h1 class="text-3xl font-bold mb-6 text-blue-800 dark:text-blue-300">💬 Comment Moderation</h1>
+
+  <% if (comments.length === 0) { %>
+    <p class="text-gray-500 dark:text-gray-400">No comments found.</p>
+  <% } else { %>
+    <div class="overflow-x-auto rounded shadow bg-white dark:bg-gray-800">
+      <table class="w-full text-sm table-auto border-collapse">
+        <thead class="bg-gray-100 dark:bg-gray-700 text-left">
+          <tr>
+            <th class="p-3">Post ID</th>
+            <th class="p-3">Author</th>
+            <th class="p-3">Comment</th>
+            <th class="p-3">Status</th>
+            <th class="p-3 text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% comments.forEach(comment => { %>
+            <tr class="border-t dark:border-gray-700">
+              <td class="p-3 text-blue-600"><%= comment.postId %></td>
+              <td class="p-3"><%= comment.name || 'Anonymous' %></td>
+              <td class="p-3 max-w-xs overflow-hidden text-ellipsis whitespace-nowrap">
+  <%= (comment.comment || '').slice(0, 100) %>
+</td>
+              <td class="p-3">
+                <% if (comment.status === 'pending') { %>
+                  <span class="text-yellow-500 font-medium">Pending</span>
+                <% } else if (comment.status === 'approved') { %>
+                  <span class="text-green-500 font-medium">Approved</span>
+                <% } else { %>
+                  <span class="text-red-500 font-medium">Rejected</span>
+                <% } %>
+              </td>
+              <td class="p-3 text-center">
+                <div class="flex flex-wrap justify-center gap-2">
+                  <% if (comment.status !== 'approved') { %>
+                    <form action="/admin/comments/<%= comment.id %>/approve" method="POST">
+                      <button type="submit" class="px-2 py-1 text-xs bg-green-600 hover:bg-green-700 text-white rounded">✅ Approve</button>
+                    </form>
+                  <% } %>
+                  <% if (comment.status !== 'rejected') { %>
+                    <form action="/admin/comments/<%= comment.id %>/reject" method="POST">
+                      <button type="submit" class="px-2 py-1 text-xs bg-yellow-500 hover:bg-yellow-600 text-white rounded">🚫 Reject</button>
+                    </form>
+                  <% } %>
+                  <% if (!comment.flagged) { %>
+                    <form action="/admin/comments/<%= comment.id %>/flag" method="POST">
+                      <button type="submit" class="px-2 py-1 text-xs bg-orange-600 hover:bg-orange-700 text-white rounded">🚩 Flag</button>
+                    </form>
+                  <% } %>
+                  <form action="/admin/comments/<%= comment.id %>/delete" method="POST" onsubmit="return confirm('Permanently delete this comment?')">
+                    <button type="submit" class="px-2 py-1 text-xs bg-red-600 hover:bg-red-700 text-white rounded">🗑 Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <% if (totalPages > 1) { %>
+      <nav class="mt-6 flex justify-center gap-2">
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <a href="?page=<%= i %>" class="px-3 py-1 rounded border 
+            <%= i === currentPage ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600' %>">
+            <%= i %>
+          </a>
+        <% } %>
+      </nav>
+    <% } %>
+  <% } %>
+</main>
+
+<%- include('partials/footer') %>

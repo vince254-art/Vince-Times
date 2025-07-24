@@ -1,0 +1,103 @@
+[
+  {
+    "id": "1753218273439",
+    "postId": "1753118148319",
+    "author": "jpsep",
+    "text": "no comment",
+    "status": "pending",
+    "upvotes": 0,
+    "flagged": false,
+    "createdAt": "2025-07-22T21:04:33.439Z"
+  },
+  {
+    "id": "1753218321238",
+    "postId": "1753118148319",
+    "author": "jpsep",
+    "text": "nothing good",
+    "status": "pending",
+    "upvotes": 0,
+    "flagged": false,
+    "createdAt": "2025-07-22T21:05:21.238Z"
+  },
+  {
+    "id": "1753371097293",
+    "postId": "1753118148319",
+    "text": "hello",
+    "author": "jpsep",
+    "date": "2025-07-24T15:31:37.296Z",
+    "approved": true,
+    "upvotes": 0
+  },
+  {
+    "id": "1753371166502",
+    "postId": "1753118148319",
+    "text": "I'ts amazing, good work man keep pushing",
+    "author": "vince",
+    "date": "2025-07-24T15:32:46.502Z",
+    "approved": true,
+    "upvotes": 0
+  },
+  {
+    "id": "1753371809871",
+    "postId": "1753118148319",
+    "text": "**great job**",
+    "author": "jayson",
+    "date": "2025-07-24T15:43:29.875Z",
+    "approved": true,
+    "upvotes": 0
+  },
+  {
+    "id": "1753371853287",
+    "postId": "1753118148319",
+    "text": "poor",
+    "author": "guy",
+    "date": "2025-07-24T15:44:13.287Z",
+    "approved": true,
+    "upvotes": 0
+  },
+  {
+    "id": "1753374290309",
+    "postId": "1753118148319",
+    "name": "vince",
+    "comment": "good",
+    "status": "pending",
+    "upvotes": 0,
+    "flagged": false
+  },
+  {
+    "id": "1753374322405",
+    "postId": "1753118148319",
+    "name": "jayson",
+    "comment": "hello",
+    "status": "pending",
+    "upvotes": 0,
+    "flagged": false
+  },
+  {
+    "id": "1753374912169",
+    "postId": "1753118148319",
+    "name": "jayson",
+    "comment": "viva",
+    "status": "pending",
+    "upvotes": 0,
+    "flagged": false
+  },
+  {
+    "id": "1753375468814",
+    "postId": "1753118148319",
+    "name": "jayson",
+    "comment": "great job man",
+    "status": "approved",
+    "upvotes": 0,
+    "flagged": true
+  },
+  {
+    "id": "1753379549249",
+    "postId": "1753118148319",
+    "name": "guy",
+    "comment": "That's dope, man",
+    "status": "approved",
+    "upvotes": 0,
+    "flagged": false
+  }
+]

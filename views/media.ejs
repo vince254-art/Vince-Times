@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head') %>
+  <link rel="stylesheet" href="/styles/main.css">
+  <title>Media Gallery | VinceTimes</title>
+</head>
+<body>
+  <%- include('partials/navbar') %>
+
+  <main class="container">
+    <h1>📸 Media Gallery</h1>
+    <div class="gallery">
+      <% posts.forEach(post => { %>
+        <% if (post.media) { %>
+          <div class="gallery-item">
+            <a href="/post/<%= post.id %>">
+              <img src="<%= post.media %>" alt="<%= post.title %>">
+              <p><%= post.title %></p>
+            </a>
+          </div>
+        <% } %>
+      <% }) %>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

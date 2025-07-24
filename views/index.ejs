@@ -1,0 +1,64 @@
+<%- include('partials/header') %>
+<%- include('partials/head') %>
+<body class="light-mode">
+  <%- include('partials/hero') %>
+
+  <main class="container fade-in">
+
+    <!-- 🔍 Search -->
+    <form action="/" method="get" class="search-form">
+      <input 
+        type="text" 
+        name="search" 
+        placeholder="Search articles..." 
+        value="<%= search || '' %>"
+        class="search-input"
+      >
+      <button type="submit" class="search-button">Search</button>
+    </form>
+
+    <!-- 🏷️ Filter by Category -->
+    <div class="category-filters">
+      <% ['News', 'Politics', 'Sports','Business','Technology', 'Lifestyle', 'Opinion', 'Entertainment'].forEach(cat => { %>
+        <a 
+         href="/?category=<%= cat %>" 
+          class="category-button <%= category === cat ? 'active' : '' %>"
+        >
+          <%= cat %>
+        </a>
+      <% }) %>
+    </div>
+
+    <!-- 📰 Post Grid -->
+    <section id="latest">
+      <% if (posts.length === 0) { %>
+        <p class="no-posts">No posts found.</p>
+      <% } else { %>
+        <div class="post-grid">
+          <% posts.forEach(post => { %>
+            <article class="post-card">
+              <a href="/post/<%= post.id %>">
+                <% if (post.media) { %>
+                  <img src="<%= post.media %>" alt="<%= post.title %>" class="thumbnail">
+                <% } %>
+                <div class="post-content">
+                  <h2 class="post-title"><%= post.title %></h2>
+                  <span class="post-category"><%= post.category %></span>
+                  <p class="post-snippet">
+                    <%= post.content.substring(0, 100) %>...
+                  </p>
+                  <small class="post-date">
+                    <%= new Date(post.date).toLocaleDateString() %>
+                  </small>
+                </div>
+              </a>
+            </article>
+          <% }) %>
+        </div>
+      <% } %>
+    </section>
+  </main>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

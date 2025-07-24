@@ -1,0 +1,93 @@
+<%- include('partials/head', { title: 'Admin Dashboard' }) %>
+<%- include('partials/header') %>
+
+<main data-aos="fade-up" class="container fade-in">
+
+  <h1 class="page-title">🛠 Admin Dashboard</h1>
+
+  <!-- ➕ Create New Post -->
+  <form action="/admin/post" method="POST" enctype="multipart/form-data" class="card spaced-vertical">
+    <h2 class="section-title">➕ New Post</h2>
+
+    <form-input type="text" name="title" placeholder="Post Title" required class="form-input" />
+
+    <div>
+      <form-label class="form-label">Content</form-label>
+      <div id="editor" class="editor"></div>
+      <textarea name="content" id="content" hidden></textarea>
+    </div>
+
+    <select name="category" required class="form-input">
+      <option value="">-- Select Category --</option>
+      <option value="News">News</option>
+      <option value="Tech">Tech</option>
+      <option value="Lifestyle">Lifestyle</option>
+      <option value="Sports">Sports</option>
+      <option value="Opinion">Opinion</option>
+      <option value="Politics">Politics</option>
+    </select>
+
+    <form-input type="text" name="videoUrl" placeholder="YouTube video URL (optional)" class="form-input" />
+    <form-input type="file" name="media" class="form-input" />
+
+    <button type="submit" class="button">📤 Publish Post</button>
+  </form>
+
+  <!-- 📰 List of Posts -->
+  <h2 class="section-title">📰 Your Posts</h2>
+  <div class="table-wrapper">
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Date</th>
+          <th class="center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% posts.forEach(post => { %>
+          <tr>
+            <td><%= post.title %></td>
+            <td>
+              <span class="badge"><%= post.category || 'Uncategorized' %></span>
+            </td>
+            <td><%= new Date(post.date || post.createdAt || post.id).toLocaleDateString() %></td>
+            <td class="center">
+              <a href="/post/<%= post.id %>" class="link blue">View</a>
+              <a href="/admin/edit/<%= post.id %>" class="link yellow">Edit</a>
+              <form action="/admin/delete/<%= post.id %>" method="POST" onsubmit="return confirm('Are you sure?')" class="inline-form">
+                <button type="submit" class="link red">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<%- include('partials/footer') %>
+
+<!-- Quill Scripts -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+  const quill = new Quill('#editor', {
+    theme: 'snow',
+    placeholder: 'Write something amazing...',
+    modules: {
+      toolbar: [
+        [{ header: [1, 2, false] }],
+        ['bold', 'italic', 'underline'],
+        ['link', 'image'],
+        [{ list: 'ordered' }, { list: 'bullet' }]
+      ]
+    }
+  });
+
+  document.querySelector('form').addEventListener('submit', function () {
+    document.getElementById('content').value = quill.root.innerHTML;
+  });
+</script>
