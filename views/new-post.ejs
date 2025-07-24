@@ -1,0 +1,47 @@
+%- include('partialshead', { title 'Create New Post' }) %
+%- include('partialsheader') %
+
+main class=max-w-3xl mx-auto py-10 px-4 space-y-6
+  h1 class=text-2xl font-bold mb-4✍️ Create New Posth1
+
+  form action=adminnew method=POST enctype=multipartform-data class=space-y-4
+    div
+      label for=titleTitlelabel
+      input type=text name=title id=title required class=w-full p-2 border rounded
+    div
+
+    div
+      label for=categoryCategorylabel
+      select name=category id=category required class=w-full p-2 border rounded
+        option value=Selectoption
+        option value=NewsNewsoption
+        option value=PoliticsPoliticsoption
+        option value=SportsSportsoption
+        option value=TechnologyTechnologyoption
+        option value=BusinessBusinessoption
+        option value=LifestyleLifestyleoption
+        option value=OpinionOpinionoption
+        option value=EntertainmentEntertainmentoption
+      select
+    div
+
+    div
+      label for=mediaUpload Imagelabel
+      input type=file name=media id=media accept=image class=w-full
+    div
+
+    div
+      label for=videoUrlVideo URL (optional)label
+      input type=url name=videoUrl id=videoUrl placeholder=httpsyoutube.com... class=w-full p-2 border rounded
+    div
+
+    div
+      label for=contentPost Content (Markdown allowed)label
+      textarea name=content id=content rows=10 required class=w-full p-2 border roundedtextarea
+    div
+
+    button type=submit class=bg-blue-600 text-white px-4 py-2 rounded hoverbg-blue-700Publishbutton
+  form
+main
+
+%- include('partialsfooter') %

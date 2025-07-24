@@ -92,7 +92,7 @@ app.post('/post/:postId/comment', (req, res) => {
     postId: req.params.postId,
     name: req.body.author || 'Anonymous',
     comment: req.body.text || '',
-    status: 'approved', // <-- made visible immediately
+    status: 'approved',
     upvotes: 0,
     flagged: false
   };
@@ -130,6 +130,30 @@ app.get('/admin', requireLogin, (req, res) => {
   res.render('admin', { posts, loggedIn: true, title: 'Admin – Vince Times' });
 });
 
+// New post
+app.get('/admin/new', requireLogin, (req, res) => {
+  res.render('new-post', {
+    loggedIn: true,
+    title: 'New Post – Vince Times'
+  });
+});
+
+app.post('/admin/new', requireLogin, upload.single('media'), (req, res) => {
+  const posts = readJson(postsFile);
+  const newPost = {
+    id: Date.now().toString(),
+    title: req.body.title,
+    category: req.body.category,
+    videoUrl: req.body.videoUrl || '',
+    content: req.body.content,
+    date: new Date().toISOString(),
+    media: req.file ? '/uploads/' + req.file.filename : ''
+  };
+  posts.unshift(newPost);
+  writeJson(postsFile, posts);
+  res.redirect('/admin');
+});
+
 // Edit post
 app.get('/admin/edit/:id', requireLogin, (req, res) => {
   const posts = readJson(postsFile);
@@ -154,6 +178,14 @@ app.post('/admin/edit/:id', requireLogin, upload.single('media'), (req, res) => 
     content: req.body.content,
     media: req.file ? '/uploads/' + req.file.filename : posts[index].media
   };
+  writeJson(postsFile, posts);
+  res.redirect('/admin');
+});
+
+// ✅ DELETE POST
+app.post('/admin/delete/:id', requireLogin, (req, res) => {
+  let posts = readJson(postsFile);
+  posts = posts.filter(p => p.id !== req.params.id);
   writeJson(postsFile, posts);
   res.redirect('/admin');
 });

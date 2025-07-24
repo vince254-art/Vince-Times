@@ -6,18 +6,18 @@
   <h1 class="page-title">🛠 Admin Dashboard</h1>
 
   <!-- ➕ Create New Post -->
-  <form action="/admin/post" method="POST" enctype="multipart/form-data" class="card spaced-vertical">
+  <form action="/admin/new" method="POST" enctype="multipart/form-data" class="card spaced-vertical">
     <h2 class="section-title">➕ New Post</h2>
 
-    <form-input type="text" name="title" placeholder="Post Title" required class="form-input" />
+    <label class="form-label" for="title">Post Title</label>
+    <input type="text" id="title" name="title" placeholder="Post Title" required class="form-input" />
 
-    <div>
-      <form-label class="form-label">Content</form-label>
-      <div id="editor" class="editor"></div>
-      <textarea name="content" id="content" hidden></textarea>
-    </div>
+    <label class="form-label">Content</label>
+    <div id="editor" class="editor"></div>
+    <textarea name="content" id="content" hidden></textarea>
 
-    <select name="category" required class="form-input">
+    <label class="form-label" for="category">Category</label>
+    <select name="category" id="category" required class="form-input">
       <option value="">-- Select Category --</option>
       <option value="News">News</option>
       <option value="Tech">Tech</option>
@@ -27,8 +27,11 @@
       <option value="Politics">Politics</option>
     </select>
 
-    <form-input type="text" name="videoUrl" placeholder="YouTube video URL (optional)" class="form-input" />
-    <form-input type="file" name="media" class="form-input" />
+    <label class="form-label" for="videoUrl">YouTube video URL (optional)</label>
+    <input type="text" name="videoUrl" id="videoUrl" placeholder="YouTube video URL" class="form-input" />
+
+    <label class="form-label" for="media">Media</label>
+    <input type="file" name="media" id="media" class="form-input" />
 
     <button type="submit" class="button">📤 Publish Post</button>
   </form>
