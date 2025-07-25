@@ -53,7 +53,7 @@
             </div>
 
             <script>
-              const rawText_<%= comment._id %> = `<%- comment.text.replace(/`/g, '\\`') %>`;
+              const rawText_<%= comment._id %> = `<%- (comment.text || '').replace(/`/g, '\\`') %>`;
               document.addEventListener('DOMContentLoaded', () => {
                 const el = document.getElementById('comment-<%= comment._id %>');
                 if (el) el.innerHTML = DOMPurify.sanitize(marked.parse(rawText_<%= comment._id %>));
