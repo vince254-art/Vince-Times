@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const commentSchema = new mongoose.Schema({
   postId: {
     type: mongoose.Schema.Types.ObjectId,
+    required: true,
     ref: 'Post'
   },
   name: String,
@@ -19,6 +20,6 @@ const commentSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Comment', commentSchema);

@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config(); 
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
@@ -11,12 +11,10 @@ const Comment = require('./models/Comment');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ MongoDB connection (with password properly embedded)
-mongoose.connect('mongodb+srv://VinceTimes:%40Vinlee.ke4@vincetimes.jf7b5xc.mongodb.net/vincetimes?retryWrites=true&w=majority&appName=VinceTimes', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-  .then(() => console.log('✅ Connected to MongoDB'))
+// ✅ MongoDB connection (uses .env)
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true
+}).then(() => console.log('✅ Connected to MongoDB'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
 // Middleware
