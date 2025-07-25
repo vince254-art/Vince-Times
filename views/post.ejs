@@ -44,19 +44,19 @@
                 <span class="flagged">🚩 Flagged</span>
               <% } %>
             </div>
-            <div class="comment-text" id="comment-<%= comment.id %>"></div>
+            <div class="comment-text" id="comment-<%= comment._id %>"></div>
 
             <!-- Upvote -->
             <div class="upvote-section">
-              <button class="upvote-btn" data-post-id="<%= post.id %>" data-comment-id="<%= comment.id %>">⬆ Upvote</button>
+              <button class="upvote-btn" data-post-id="<%= post._id %>" data-comment-id="<%= comment._id %>">⬆ Upvote</button>
               <span><%= comment.upvotes || 0 %> upvote<%= (comment.upvotes || 0) === 1 ? '' : 's' %></span>
             </div>
 
             <script>
-              const rawText_<%= comment.id %> = `<%- comment.comment.replace(/`/g, '\\`') %>`;
+              const rawText_<%= comment._id %> = `<%- comment.comment.replace(/`/g, '\\`') %>`;
               document.addEventListener('DOMContentLoaded', () => {
-                const el = document.getElementById('comment-<%= comment.id %>');
-                if (el) el.innerHTML = DOMPurify.sanitize(marked.parse(rawText_<%= comment.id %>));
+                const el = document.getElementById('comment-<%= comment._id %>');
+                if (el) el.innerHTML = DOMPurify.sanitize(marked.parse(rawText_<%= comment._id %>));
               });
             </script>
           </div>
@@ -67,7 +67,7 @@
     <% } %>
 
     <!-- ✏️ Add Comment Form -->
-    <form action="/post/<%= post.id %>/comment" method="POST" class="comment-form">
+    <form action="/post/<%= post._id %>/comment" method="POST" class="comment-form">
       <div class="form-group">
         <label for="author">👤 Your Name</label>
         <input type="text" name="author" id="author" required placeholder="e.g. VinceRadio">
@@ -87,9 +87,9 @@
 
     <!-- 📤 Share Buttons -->
     <div class="share-buttons">
-      <a href="https://twitter.com/intent/tweet?text=<%= encodeURIComponent(post.title) %>&url=https://vincetimes.com/post/<%= post.id %>" target="_blank">🐦</a>
-      <a href="https://www.facebook.com/sharer/sharer.php?u=https://vincetimes.com/post/<%= post.id %>" target="_blank">📘</a>
-      <a href="mailto:?subject=<%= encodeURIComponent(post.title) %>&body=Check this out: https://vincetimes.com/post/<%= post.id %>">✉️</a>
+      <a href="https://twitter.com/intent/tweet?text=<%= encodeURIComponent(post.title) %>&url=https://vincetimes.com/post/<%= post._id %>" target="_blank">🐦</a>
+      <a href="https://www.facebook.com/sharer/sharer.php?u=https://vincetimes.com/post/<%= post._id %>" target="_blank">📘</a>
+      <a href="mailto:?subject=<%= encodeURIComponent(post.title) %>&body=Check this out: https://vincetimes.com/post/<%= post._id %>">✉️</a>
     </div>
   </section>
 </main>
