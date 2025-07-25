@@ -39,7 +39,7 @@
         <% if (comment.status === 'approved') { %>
           <div class="comment">
             <div class="comment-header">
-              <span class="comment-author"><%= comment.name %></span>
+              <span class="comment-author"><%= comment.author %></span>
               <% if (comment.flagged) { %>
                 <span class="flagged">🚩 Flagged</span>
               <% } %>
@@ -53,7 +53,7 @@
             </div>
 
             <script>
-              const rawText_<%= comment._id %> = `<%- (comment.text || '').replace(/`/g, '\\`') %>`;
+              const rawText_<%= comment._id %> = `<%- comment.text.replace(/`/g, '\\`') %>`;
               document.addEventListener('DOMContentLoaded', () => {
                 const el = document.getElementById('comment-<%= comment._id %>');
                 if (el) el.innerHTML = DOMPurify.sanitize(marked.parse(rawText_<%= comment._id %>));
@@ -61,7 +61,7 @@
             </script>
           </div>
         <% } %>
-      <% }) %>
+      <% }); %>
     <% } else { %>
       <p class="no-comments">No comments yet. Be the first to share your thoughts!</p>
     <% } %>
