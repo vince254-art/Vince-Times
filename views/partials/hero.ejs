@@ -1,7 +1,7 @@
 <section class="hero-section">
   <div class="hero-content">
-    <h1 class="hero-title">Welcome to VinceTimes</h1>
-    <p class="hero-subtitle">Your trusted source for uncensored journalism, tech insights, and more.</p>
+    <h1 class="hero-title">Welcome to Vince Times</h1>
+    <p class="hero-subtitle">Your trusted source for uncensored News, Tech insights, Business, Sports, Lifestyle & Entertainment and many more.</p>
     <a href="#latest" class="hero-button">Explore Latest Stories</a>
   </div>
 </section>
@@ -11,29 +11,31 @@
     position: relative;
     padding: 6rem 2rem;
     text-align: center;
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), url('/images/hero-bg.jpg') center/cover no-repeat;
+    background: linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.7)), url('/images/hero-bg.jpg') center/cover no-repeat;
     color: var(--hero-text, #fff);
+    transition: background 0.4s ease, color 0.3s ease;
   }
 
   html.dark .hero-section {
-    --hero-text: #f0f0f0;
+    --hero-text: #f3f4f6;
   }
 
   html:not(.dark) .hero-section {
-    --hero-text: #f9f9f9;
+    --hero-text: #f9fafb;
   }
 
   .hero-content {
     max-width: 800px;
     margin: 0 auto;
-    animation: fadeInUp 1.2s ease forwards;
+    animation: fadeInUp 1s ease-out forwards;
   }
 
   .hero-title {
     font-size: 3rem;
-    font-weight: 700;
+    font-weight: 800;
     margin-bottom: 1rem;
     color: inherit;
+    letter-spacing: -0.5px;
   }
 
   .hero-subtitle {
@@ -45,8 +47,8 @@
 
   .hero-button {
     background-color: #2563eb;
-    color: #fff;
-    font-weight: bold;
+    color: #ffffff;
+    font-weight: 600;
     text-decoration: none;
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
@@ -62,7 +64,7 @@
   @keyframes fadeInUp {
     0% {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(30px);
     }
     100% {
       opacity: 1;
@@ -72,11 +74,16 @@
 
   @media (max-width: 768px) {
     .hero-title {
-      font-size: 2rem;
+      font-size: 2.25rem;
     }
 
     .hero-subtitle {
       font-size: 1rem;
+    }
+
+    .hero-button {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.95rem;
     }
   }
 </style>

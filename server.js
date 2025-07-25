@@ -14,7 +14,7 @@ app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
 app.set('view engine', 'ejs');
 
-// Session
+// Session setup
 app.use(session({
   secret: 'super-secret-key',
   resave: false,
@@ -27,17 +27,17 @@ const postsFile = path.join(__dirname, 'data/posts.json');
 const commentsFile = path.join(__dirname, 'data/comments.json');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
 
-// Multer config
+// Multer for file uploads
 const storage = multer.diskStorage({
   destination: (_, __, cb) => cb(null, 'uploads'),
   filename: (_, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
 });
 const upload = multer({ storage });
 
-// Utilities
+// JSON read/write helpers
 const readJson = (filePath) => {
   try {
-    return JSON.parse(fs.readFileSync(filePath, 'utf-8') || '[]');
+    return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
   } catch {
     return [];
   }
@@ -48,11 +48,13 @@ const writeJson = (filePath, data) => {
 
 // Auth middleware
 const requireLogin = (req, res, next) => {
-  if (req.session.loggedIn) next();
-  else res.redirect('/login');
+  if (req.session.loggedIn) return next();
+  res.redirect('/login');
 };
 
-// Home
+// === ROUTES ===
+
+// Homepage
 app.get('/', (req, res) => {
   const posts = readJson(postsFile);
   const search = req.query.search || '';
@@ -70,12 +72,13 @@ app.get('/', (req, res) => {
   });
 });
 
-// View single post
+// View a single post
 app.get('/post/:id', (req, res) => {
   const posts = readJson(postsFile);
   const comments = readJson(commentsFile);
   const post = posts.find(p => p.id === req.params.id);
   if (!post) return res.status(404).send('Post not found');
+
   const postComments = comments.filter(c => c.postId === post.id && c.status === 'approved');
   res.render('post', {
     post: { ...post, comments: postComments },
@@ -84,7 +87,7 @@ app.get('/post/:id', (req, res) => {
   });
 });
 
-// Post comment (immediately visible)
+// Submit a comment
 app.post('/post/:postId/comment', (req, res) => {
   const comments = readJson(commentsFile);
   const newComment = {
@@ -101,7 +104,7 @@ app.post('/post/:postId/comment', (req, res) => {
   res.redirect('/post/' + req.params.postId);
 });
 
-// Flag comment
+// Flag a comment
 app.post('/post/:postId/comment/:commentId/flag', (req, res) => {
   const comments = readJson(commentsFile);
   const comment = comments.find(c => c.id === req.params.commentId && c.postId === req.params.postId);
@@ -112,7 +115,7 @@ app.post('/post/:postId/comment/:commentId/flag', (req, res) => {
   res.redirect('/post/' + req.params.postId);
 });
 
-// Upvote comment
+// Upvote a comment
 app.post('/post/:postId/comment/:commentId/upvote', (req, res) => {
   const comments = readJson(commentsFile);
   const comment = comments.find(c => c.id === req.params.commentId && c.postId === req.params.postId);
@@ -130,14 +133,12 @@ app.get('/admin', requireLogin, (req, res) => {
   res.render('admin', { posts, loggedIn: true, title: 'Admin – Vince Times' });
 });
 
-// New post
+// New post form
 app.get('/admin/new', requireLogin, (req, res) => {
-  res.render('new-post', {
-    loggedIn: true,
-    title: 'New Post – Vince Times'
-  });
+  res.render('new-post', { loggedIn: true, title: 'New Post – Vince Times' });
 });
 
+// Create post
 app.post('/admin/new', requireLogin, upload.single('media'), (req, res) => {
   const posts = readJson(postsFile);
   const newPost = {
@@ -159,6 +160,7 @@ app.get('/admin/edit/:id', requireLogin, (req, res) => {
   const posts = readJson(postsFile);
   const post = posts.find(p => p.id === req.params.id);
   if (!post) return res.status(404).send('Post not found');
+
   res.render('edit-post', {
     post,
     loggedIn: true,
@@ -166,10 +168,12 @@ app.get('/admin/edit/:id', requireLogin, (req, res) => {
   });
 });
 
+// Save edited post
 app.post('/admin/edit/:id', requireLogin, upload.single('media'), (req, res) => {
   const posts = readJson(postsFile);
   const index = posts.findIndex(p => p.id === req.params.id);
   if (index === -1) return res.status(404).send('Post not found');
+
   posts[index] = {
     ...posts[index],
     title: req.body.title,
@@ -182,7 +186,7 @@ app.post('/admin/edit/:id', requireLogin, upload.single('media'), (req, res) => 
   res.redirect('/admin');
 });
 
-// ✅ DELETE POST
+// Delete post
 app.post('/admin/delete/:id', requireLogin, (req, res) => {
   let posts = readJson(postsFile);
   posts = posts.filter(p => p.id !== req.params.id);
@@ -190,7 +194,7 @@ app.post('/admin/delete/:id', requireLogin, (req, res) => {
   res.redirect('/admin');
 });
 
-// Admin comments
+// Admin comment moderation
 app.get('/admin/comments', requireLogin, (req, res) => {
   const comments = readJson(commentsFile);
   const page = parseInt(req.query.page) || 1;
@@ -227,10 +231,7 @@ app.post('/admin/comments/:id/flag', requireLogin, (req, res) => {
 
 // Login
 app.get('/login', (req, res) => {
-  res.render('login', {
-    loggedIn: req.session.loggedIn,
-    title: 'Login – Vince Times'
-  });
+  res.render('login', { loggedIn: req.session.loggedIn, title: 'Login – Vince Times' });
 });
 
 app.post('/login', (req, res) => {
@@ -247,8 +248,10 @@ app.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'));
 });
 
-// 404
+// 404 fallback
 app.use((_, res) => res.status(404).send('Page not found'));
 
-// Start
-app.listen(PORT, () => console.log(`🚀 Running on http://localhost:${PORT}`));
+// Server start
+app.listen(PORT, () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
+});

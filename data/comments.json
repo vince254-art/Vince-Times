@@ -88,7 +88,7 @@
     "name": "jayson",
     "comment": "great job man",
     "status": "approved",
-    "upvotes": 0,
+    "upvotes": 1,
     "flagged": true
   },
   {
@@ -97,7 +97,25 @@
     "name": "guy",
     "comment": "That's dope, man",
     "status": "approved",
+    "upvotes": 1,
+    "flagged": false
+  },
+  {
+    "id": "1753446864787",
+    "postId": "1753118148319",
+    "name": "vince",
+    "comment": "great work",
+    "status": "approved",
     "upvotes": 0,
+    "flagged": false
+  },
+  {
+    "id": "1753450043622",
+    "postId": "1753449794995",
+    "name": "Andrea",
+    "comment": "That's scary, I just hope they won't replace us one day",
+    "status": "approved",
+    "upvotes": 1,
     "flagged": false
   }
 ]

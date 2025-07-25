@@ -1,59 +1,251 @@
-<header class="bg-light dark:bg-gray-900 text-gray-800 dark:text-white shadow sticky top-0 z-50">
-  <div class="max-w-screen-xl mx-auto px-4 py-4 flex items-center justify-between">
-    <!-- Logo -->
-    <a href="/" class="text-4xl bold">Vince Times</a>
+<header class="navbar">
+  <div class="navbar-container">
+    <a href="/" class="navbar-logo">Vince Times</a>
 
-  <!-- Mobile Nav -->
-  <div id="mobileMenu" class="md:hidden hidden px-4 pb-4 spaced-vertical-2">
-    <a href="/" class="block hover:underline">All</a>
-    <a href="/?category=News" class="block hover:underline">News</a>
-    <a href="/?category=Politics" class="block hover:underline">Politics</a>
-     <a href="/?category=Sports" class="block hover:underline">Sports</a>
-    <a href="/?category=Lifestyle" class="block hover:underline">Lifestyle</a>
-     <a href="/?category=Entertainment" class="block hover:underline">Entertainment</a>
-    <a href="/?category=Opinion" class="block hover:underline">Opinion</a>
+    <div class="navbar-actions">
+      <a href="/" class="home-button">Home</a>
+      <button id="hamburger" class="hamburger" aria-label="Toggle Menu">
+        <span class="bar top"></span>
+        <span class="bar middle"></span>
+        <span class="bar bottom"></span>
+      </button>
+    </div>
+  </div>
 
-    <button id="darkToggleMobile" class="text-xl">🌙</button>
-  
-    <button id="hamburger" class="md:hidden page-title focus:outline-none">☰</button>
+  <!-- Overlay -->
+  <div id="menuOverlay" class="menu-overlay"></div>
+
+  <!-- Slide Panel -->
+  <div id="mobileMenu" class="mobile-menu">
+    <a href="/?category=News">News</a>
+    <a href="/?category=Technology">Technology</a>
+    <a href="/?category=Sports">Sports</a>
+    <a href="/?category=Politics">Politics</a>
+    <a href="/?category=Opinion">Opinion</a>
+    <a href="/?category=Lifestyle">Lifestyle</a>
+    <a href="/?category=Entertainment">Entertainment</a>
+    <button id="darkToggleMobile">🌙</button>
 
     <% if (loggedIn) { %>
-      <a href="/admin" class="block hover:underline">Dashboard</a>
-      <a href="/logout" class="block hover:underline text-red-500">Logout</a>
+      <a href="/admin">Dashboard</a>
+      <a href="/logout" class="logout">Logout</a>
     <% } else { %>
-      <a href="/login" class="block hover:underline text-blue-500">Login</a>
+      <a href="/login" class="login">Login</a>
     <% } %>
   </div>
 </header>
 
-<!-- Script -->
+<style>
+  :root {
+    --bg-light: #fff;
+    --bg-dark: #1e293b;
+    --text-light: #1e293b;
+    --text-dark: #f3f4f6;
+  }
+
+  .navbar {
+    background: var(--bg-light);
+    color: var(--text-light);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .dark .navbar {
+    background: var(--bg-dark);
+    color: var(--text-dark);
+  }
+
+  .navbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .navbar-logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .home-button {
+    text-decoration: none;
+    font-weight: 500;
+    color: inherit;
+    padding: 0.3rem 0.75rem;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .dark .home-button {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .hamburger {
+    display: inline-block;
+    width: 26px;
+    height: 22px;
+    position: relative;
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+
+  .hamburger .bar {
+    display: block;
+    height: 3px;
+    background: currentColor;
+    border-radius: 2px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .hamburger .top {
+    top: 0;
+  }
+
+  .hamburger .middle {
+    top: 9px;
+  }
+
+  .hamburger .bottom {
+    bottom: 0;
+  }
+
+  .hamburger.open .top {
+    transform: rotate(45deg) translate(4px, 4px);
+  }
+
+  .hamburger.open .middle {
+    opacity: 0;
+  }
+
+  .hamburger.open .bottom {
+    transform: rotate(-45deg) translate(5px, -5px);
+  }
+
+  .menu-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 98;
+  }
+
+  .menu-overlay.active {
+    display: block;
+  }
+
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 280px;
+    height: 100%;
+    background: var(--bg-light);
+    color: var(--text-light);
+    box-shadow: -2px 0 6px rgba(0,0,0,0.1);
+    overflow-y: auto;
+    transition: right 0.3s ease;
+    padding: 2rem 1.5rem 1.5rem;
+    z-index: 99;
+  }
+
+  .dark .mobile-menu {
+    background: var(--bg-dark);
+    color: var(--text-dark);
+  }
+
+  .mobile-menu.show {
+    right: 0;
+  }
+
+  .mobile-menu a,
+  .mobile-menu button {
+    display: block;
+    padding: 0.75rem 0;
+    text-decoration: none;
+    color: inherit;
+    font-weight: 500;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .mobile-menu .logout {
+    color: red;
+  }
+
+  .mobile-menu .login {
+    color: #2563eb;
+  }
+
+  @media (max-width: 600px) {
+    .home-button {
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
 <script>
   const burger = document.getElementById("hamburger");
   const mobileMenu = document.getElementById("mobileMenu");
-  const darkToggle = document.getElementById("darkToggle");
+  const overlay = document.getElementById("menuOverlay");
   const darkToggleMobile = document.getElementById("darkToggleMobile");
 
-  burger?.addEventListener("click", () => {
-    mobileMenu.classList.toggle("hidden");
+  function toggleMenu(show) {
+    mobileMenu.classList.toggle("show", show);
+    overlay.classList.toggle("active", show);
+    burger.classList.toggle("open", show);
+  }
+
+  burger?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleMenu(!burger.classList.contains("open"));
+  });
+
+  overlay?.addEventListener("click", () => toggleMenu(false));
+
+  document.addEventListener("click", (e) => {
+    if (!mobileMenu.contains(e.target) && !burger.contains(e.target)) {
+      toggleMenu(false);
+    }
+  });
+
+  // Auto-close menu on link click
+  mobileMenu.querySelectorAll("a, button").forEach(el => {
+    el.addEventListener("click", () => toggleMenu(false));
   });
 
   function toggleDarkMode() {
     document.documentElement.classList.toggle("dark");
     const isDark = document.documentElement.classList.contains("dark");
     localStorage.setItem("theme", isDark ? "dark" : "light");
-    if (darkToggle) darkToggle.textContent = isDark ? "☀️" : "🌙";
     if (darkToggleMobile) darkToggleMobile.textContent = isDark ? "☀️" : "🌙";
   }
 
-  darkToggle?.addEventListener("click", toggleDarkMode);
   darkToggleMobile?.addEventListener("click", toggleDarkMode);
 
+  // Initialize theme
   if (localStorage.getItem("theme") === "dark") {
     document.documentElement.classList.add("dark");
   }
 
-  // Update icon on page load
   const isDark = document.documentElement.classList.contains("dark");
-  if (darkToggle) darkToggle.textContent = isDark ? "☀️" : "🌙";
   if (darkToggleMobile) darkToggleMobile.textContent = isDark ? "☀️" : "🌙";
 </script>

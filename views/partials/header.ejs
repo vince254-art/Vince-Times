@@ -1,31 +1,33 @@
-<!-- views/partials/header.ejs -->
 <header class="bg-light dark:bg-gray-900 text-gray-800 dark:text-white shadow sticky top-0 z-50">
   <div class="max-w-screen-xl mx-auto px-4 py-4 flex items-center justify-between">
     <a href="/" class="text-4xl bold">Vince Times</a>
 
-  <!-- Mobile Nav -->
-  <div id="mobileMenu" class="md:hidden hidden px-4 pb-4 spaced-vertical-2">
-    <a href="/" class="block hover:underline">All</a>
-    <a href="/?category=News" class="block hover:underline">News</a>
-    <a href="/?category=Technology" class="block hover:underline">Technology</a>
-    <a href="/?category=Sports" class="block hover:underline">Sports</a>
-    <a href="/?category=Politics" class="block hover:underline">Politics</a>
-    <a href="/?category=Opinion" class="block hover:underline">Opinion</a>
-    <a href="/?category=Lifestyle" class="block hover:underline">Lifestyle</a>
-    <a href="/?category=Entertainment" class="block hover:underline">Entertainment</a>
+    <!-- Desktop Nav -->
+    <nav class="hidden md:flex gap-4">
+      <a href="/" class="hover:underline">Home</a>
+      <a href="/?category=News" class="hover:underline">News</a>
+      <a href="/?category=Technology" class="hover:underline">Technology</a>
+      <a href="/?category=Sports" class="hover:underline">Sports</a>
+      <a href="/?category=Politics" class="hover:underline">Politics</a>
+      <a href="/?category=Opinion" class="hover:underline">Opinion</a>
+      <a href="/?category=Lifestyle" class="hover:underline">Lifestyle</a>
+      <a href="/?category=Entertainment" class="hover:underline">Entertainment</a>
+    </nav>
 
-    <% if (loggedIn) { %>
+    <!-- Desktop Dark Mode -->
+        <% if (loggedIn) { %>
       <a href="/admin" class="block hover:underline">Dashboard</a>
       <a href="/logout" class="block hover:underline text-red-500">Logout</a>
     <% } else { %>
       <a href="/login" class="block hover:underline text-blue-500">Login</a>
     <% } %>
      <button id="darkToggleMobile" class="text-xl">🌙</button>
-
-    <button id="hamburger" class="md:hidden page-title focus:outline-none">☰</button>
+    <!-- Hamburger Always Visible -->
+    <button id="hamburger" class="md:hidden text-2xl">☰</button>
   </div>
 </header>
 
+<!-- JS Script -->
 <script>
   const burger = document.getElementById("hamburger");
   const mobileMenu = document.getElementById("mobileMenu");
@@ -33,21 +35,27 @@
   const darkToggleMobile = document.getElementById("darkToggleMobile");
 
   burger?.addEventListener("click", () => {
-    mobileMenu.classList.toggle("hidden");
+    const isMobile = window.innerWidth < 768;
+    if (isMobile) {
+      mobileMenu.classList.toggle("hidden");
+    }
   });
 
   function toggleDarkMode() {
     document.documentElement.classList.toggle("dark");
     const isDark = document.documentElement.classList.contains("dark");
-    localStorage.setItem("theme", isDark ? "dark" : "light");
     if (darkToggle) darkToggle.textContent = isDark ? "☀️" : "🌙";
     if (darkToggleMobile) darkToggleMobile.textContent = isDark ? "☀️" : "🌙";
+    localStorage.setItem("theme", isDark ? "dark" : "light");
   }
 
   darkToggle?.addEventListener("click", toggleDarkMode);
   darkToggleMobile?.addEventListener("click", toggleDarkMode);
 
+  // Load saved theme
   if (localStorage.getItem("theme") === "dark") {
     document.documentElement.classList.add("dark");
+    if (darkToggle) darkToggle.textContent = "☀️";
+    if (darkToggleMobile) darkToggleMobile.textContent = "☀️";
   }
 </script>

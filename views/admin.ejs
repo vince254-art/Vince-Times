@@ -1,5 +1,5 @@
 <%- include('partials/head', { title: 'Admin Dashboard' }) %>
-<%- include('partials/header') %>
+<%- include('partials/navbar') %>
 
 <main data-aos="fade-up" class="container fade-in">
 
@@ -20,11 +20,13 @@
     <select name="category" id="category" required class="form-input">
       <option value="">-- Select Category --</option>
       <option value="News">News</option>
-      <option value="Tech">Tech</option>
+      <option value="Technology">Technology</option>
       <option value="Lifestyle">Lifestyle</option>
       <option value="Sports">Sports</option>
       <option value="Opinion">Opinion</option>
       <option value="Politics">Politics</option>
+      <option value="Entertainment">Entertainment</option>
+      <option value="Business">Business</option>
     </select>
 
     <label class="form-label" for="videoUrl">YouTube video URL (optional)</label>
