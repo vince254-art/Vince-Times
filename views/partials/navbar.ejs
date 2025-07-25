@@ -17,6 +17,8 @@
 
   <!-- Slide Panel -->
   <div id="mobileMenu" class="mobile-menu">
+    <button id="closeMenu" class="close-button" aria-label="Close menu">×</button>
+
     <a href="/?category=News">News</a>
     <a href="/?category=Technology">Technology</a>
     <a href="/?category=Sports">Sports</a>
@@ -113,17 +115,9 @@
     transition: transform 0.3s ease, opacity 0.3s ease;
   }
 
-  .hamburger .top {
-    top: 0;
-  }
-
-  .hamburger .middle {
-    top: 9px;
-  }
-
-  .hamburger .bottom {
-    bottom: 0;
-  }
+  .hamburger .top { top: 0; }
+  .hamburger .middle { top: 9px; }
+  .hamburger .bottom { bottom: 0; }
 
   .hamburger.open .top {
     transform: rotate(45deg) translate(4px, 4px);
@@ -152,16 +146,17 @@
   .mobile-menu {
     position: fixed;
     top: 0;
-    right: -300px;
+    right: -320px;
     width: 280px;
     height: 100%;
     background: var(--bg-light);
     color: var(--text-light);
     box-shadow: -2px 0 6px rgba(0,0,0,0.1);
     overflow-y: auto;
-    transition: right 0.3s ease;
+    transition: right 0.3s ease, visibility 0.3s ease;
     padding: 2rem 1.5rem 1.5rem;
     z-index: 99;
+    visibility: hidden;
   }
 
   .dark .mobile-menu {
@@ -171,6 +166,7 @@
 
   .mobile-menu.show {
     right: 0;
+    visibility: visible;
   }
 
   .mobile-menu a,
@@ -187,18 +183,26 @@
     cursor: pointer;
   }
 
-  .mobile-menu .logout {
-    color: red;
+  .mobile-menu .logout { color: red; }
+  .mobile-menu .login { color: #2563eb; }
+
+  .close-button {
+    font-size: 1.5rem;
+    position: absolute;
+    top: 0.8rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
   }
 
-  .mobile-menu .login {
-    color: #2563eb;
+  @media (max-width: 768px) {
+    .home-button { font-size: 0.9rem; }
   }
 
-  @media (max-width: 600px) {
-    .home-button {
-      font-size: 0.9rem;
-    }
+  body.menu-open {
+    overflow: hidden;
   }
 </style>
 
@@ -206,12 +210,14 @@
   const burger = document.getElementById("hamburger");
   const mobileMenu = document.getElementById("mobileMenu");
   const overlay = document.getElementById("menuOverlay");
+  const closeBtn = document.getElementById("closeMenu");
   const darkToggleMobile = document.getElementById("darkToggleMobile");
 
   function toggleMenu(show) {
     mobileMenu.classList.toggle("show", show);
     overlay.classList.toggle("active", show);
     burger.classList.toggle("open", show);
+    document.body.classList.toggle("menu-open", show);
   }
 
   burger?.addEventListener("click", (e) => {
@@ -219,6 +225,7 @@
     toggleMenu(!burger.classList.contains("open"));
   });
 
+  closeBtn?.addEventListener("click", () => toggleMenu(false));
   overlay?.addEventListener("click", () => toggleMenu(false));
 
   document.addEventListener("click", (e) => {
@@ -227,7 +234,6 @@
     }
   });
 
-  // Auto-close menu on link click
   mobileMenu.querySelectorAll("a, button").forEach(el => {
     el.addEventListener("click", () => toggleMenu(false));
   });
@@ -241,7 +247,7 @@
 
   darkToggleMobile?.addEventListener("click", toggleDarkMode);
 
-  // Initialize theme
+  // Init dark mode
   if (localStorage.getItem("theme") === "dark") {
     document.documentElement.classList.add("dark");
   }
