@@ -14,12 +14,14 @@
   "type": "commonjs",
   "dependencies": {
     "body-parser": "^2.2.0",
+    "cloudinary": "^1.41.3",
     "dotenv": "^17.2.1",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
     "mongoose": "^8.16.5",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "multer-storage-cloudinary": "^4.0.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",

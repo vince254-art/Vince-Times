@@ -13,7 +13,7 @@
     <% } %>
   </div>
 
-  <!-- 📷 Featured Image -->
+  <!-- 📷 Featured Image (from Cloudinary) -->
   <% if (post.media) { %>
     <img src="<%= post.media %>" alt="<%= post.title %>" class="post-image">
   <% } %>
@@ -44,21 +44,25 @@
                 <span class="flagged">🚩 Flagged</span>
               <% } %>
             </div>
+
+            <!-- 📝 Markdown-rendered Comment -->
             <div class="comment-text" id="comment-<%= comment._id %>"></div>
 
-            <!-- Upvote -->
-            <div class="upvote-section">
-              <button class="upvote-btn" data-post-id="<%= post._id %>" data-comment-id="<%= comment._id %>">⬆ Upvote</button>
-              <span><%= comment.upvotes || 0 %> upvote<%= (comment.upvotes || 0) === 1 ? '' : 's' %></span>
-            </div>
-
             <script>
-              const rawText_<%= comment._id %> = `<%- (comment.text || '').replace(/`/g, '\\`') %>`;
+              const rawComment_<%= comment._id %> = `<%- comment.text ? comment.text.replace(/`/g, '\\`') : '' %>`;
               document.addEventListener('DOMContentLoaded', () => {
-                const el = document.getElementById('comment-<%= comment._id %>');
-                if (el) el.innerHTML = DOMPurify.sanitize(marked.parse(rawText_<%= comment._id %>));
+                const target = document.getElementById('comment-<%= comment._id %>');
+                if (target) {
+                  target.innerHTML = DOMPurify.sanitize(marked.parse(rawComment_<%= comment._id %>));
+                }
               });
             </script>
+
+            <!-- 🔼 Upvote -->
+            <div class="upvote-section">
+              <button class="upvote-btn" data-post-id="<%= post._id %>" data-comment-id="<%= comment._id %>">⬆ Upvote</button>
+              <span><%= comment.upvotes || 0 %> upvote<%= (comment.upvotes === 1) ? '' : 's' %></span>
+            </div>
           </div>
         <% } %>
       <% }); %>
@@ -94,6 +98,7 @@
   </section>
 </main>
 
+<!-- 🛠 Markdown + Sanitizer -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
 <script>
@@ -109,11 +114,9 @@
     button.addEventListener('click', async () => {
       const postId = button.dataset.postId;
       const commentId = button.dataset.commentId;
-
       try {
         const res = await fetch(`/post/${postId}/comment/${commentId}/upvote`, { method: 'POST' });
         const data = await res.json();
-
         if (data.success) {
           const countSpan = button.nextElementSibling;
           countSpan.textContent = `${data.upvotes} upvote${data.upvotes === 1 ? '' : 's'}`;

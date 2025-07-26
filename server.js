@@ -1,9 +1,12 @@
-require('dotenv').config(); 
+require('dotenv').config();
 const express = require('express');
-const multer = require('multer');
 const path = require('path');
 const session = require('express-session');
 const mongoose = require('mongoose');
+const multer = require('multer');
+const { storage } = require('./cloudinary');
+
+const upload = multer({ storage });
 
 const Post = require('./models/Post');
 const Comment = require('./models/Comment');
@@ -11,7 +14,7 @@ const Comment = require('./models/Comment');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ MongoDB connection (uses .env)
+// ✅ MongoDB connection
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true
 }).then(() => console.log('✅ Connected to MongoDB'))
@@ -21,7 +24,6 @@ mongoose.connect(process.env.MONGODB_URI, {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
-app.use('/uploads', express.static('uploads'));
 app.set('view engine', 'ejs');
 
 // Sessions
@@ -30,13 +32,6 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }));
-
-// Multer for image uploads
-const storage = multer.diskStorage({
-  destination: (_, __, cb) => cb(null, 'uploads'),
-  filename: (_, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
-});
-const upload = multer({ storage });
 
 // Auth Middleware
 const requireLogin = (req, res, next) => {
@@ -61,7 +56,7 @@ app.get('/', async (req, res) => {
   });
 });
 
-// Single Post
+// Single Post Page
 app.get('/post/:id', async (req, res) => {
   const post = await Post.findById(req.params.id).lean();
   if (!post) return res.status(404).send('Post not found');
@@ -111,11 +106,12 @@ app.get('/admin', requireLogin, async (req, res) => {
   res.render('admin', { posts, loggedIn: true, title: 'Admin – Vince Times' });
 });
 
-// New Post
+// New Post Page
 app.get('/admin/new', requireLogin, (req, res) => {
   res.render('new-post', { loggedIn: true, title: 'New Post – Vince Times' });
 });
 
+// Create Post with Cloudinary image
 app.post('/admin/new', requireLogin, upload.single('media'), async (req, res) => {
   const newPost = new Post({
     title: req.body.title,
@@ -123,7 +119,7 @@ app.post('/admin/new', requireLogin, upload.single('media'), async (req, res) =>
     videoUrl: req.body.videoUrl || '',
     content: req.body.content,
     date: new Date(),
-    media: req.file ? '/uploads/' + req.file.filename : ''
+    media: req.file ? req.file.path : ''  // ✅ Cloudinary URL
   });
   await newPost.save();
   res.redirect('/admin');
@@ -136,6 +132,7 @@ app.get('/admin/edit/:id', requireLogin, async (req, res) => {
   res.render('edit-post', { post, loggedIn: true, title: 'Edit Post – Vince Times' });
 });
 
+// Update Post (with optional media update)
 app.post('/admin/edit/:id', requireLogin, upload.single('media'), async (req, res) => {
   const updates = {
     title: req.body.title,
@@ -143,7 +140,7 @@ app.post('/admin/edit/:id', requireLogin, upload.single('media'), async (req, re
     videoUrl: req.body.videoUrl || '',
     content: req.body.content
   };
-  if (req.file) updates.media = '/uploads/' + req.file.filename;
+  if (req.file) updates.media = req.file.path; // ✅ Cloudinary path
   await Post.findByIdAndUpdate(req.params.id, updates);
   res.redirect('/admin');
 });
@@ -154,7 +151,7 @@ app.post('/admin/delete/:id', requireLogin, async (req, res) => {
   res.redirect('/admin');
 });
 
-// Admin Comments Panel
+// Comment Moderation Panel
 app.get('/admin/comments', requireLogin, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const perPage = 10;
@@ -183,7 +180,7 @@ app.post('/admin/comments/:id/flag', requireLogin, async (req, res) => {
   res.redirect('/admin/comments');
 });
 
-// Auth
+// Login
 app.get('/login', (req, res) => {
   res.render('login', { loggedIn: req.session.loggedIn, title: 'Login – Vince Times' });
 });
@@ -205,5 +202,5 @@ app.get('/logout', (req, res) => {
 // 404
 app.use((_, res) => res.status(404).send('Page not found'));
 
-// Start server
-app.listen(PORT, () => console.log(`🚀 Running on http://localhost:${PORT}`));
+// Start Server
+app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
