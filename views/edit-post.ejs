@@ -1,71 +1,103 @@
-<%- include('partials/head', { title }) %>
-<%- include('partials/navbar') %>
 
-<main class="admin-form-container">
-  <h1>Edit Post ✏️</h1>
+<%- include('partials/head') %>
+<body>
+  <%- include('partials/navbar') %>
 
-  <form action="/admin/edit/<%= post._id %>" method="POST" enctype="multipart/form-data" class="post-form">
-    <div class="form-group">
-      <label for="title">📰 Title</label>
-      <input type="text" name="title" id="title" required value="<%= post.title %>">
-    </div>
+  <section class="max-w-3xl mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold mb-6">✏️ Edit Post</h1>
 
-    <div class="form-group">
-      <label for="category">📂 Category</label>
-      <input type="text" name="category" id="category" required value="<%= post.category %>">
-    </div>
+    <form action="/admin/edit/<%= post.id %>" method="POST" enctype="multipart/form-data"
+      class="bg-white dark:bg-gray-800 p-6 rounded shadow space-y-6">
 
-    <div class="form-group">
-      <label for="videoUrl">🎬 YouTube Video URL</label>
-      <input type="url" name="videoUrl" id="videoUrl" value="<%= post.videoUrl %>">
-    </div>
+      <!-- Title -->
+      <div>
+        <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Title</label>
+        <input type="text" name="title" value="<%= post.title %>" required
+          class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white" />
+      </div>
 
-    <div class="form-group">
-      <label>Current Image:</label>
+      <!-- Category Dropdown -->
+<div>
+  <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Category</label>
+  <select name="category" required
+    class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white">
+    <% const categories = ['Technology', 'Lifestyle', 'Business', 'Entertainment', 'Sports', 'Politics', 'Opinios', 'News']; %>
+    <% categories.forEach(cat => { %>
+      <option value="<%= cat %>" <%= post.category === cat ? 'selected' : '' %>><%= cat %></option>
+    <% }) %>
+  </select>
+</div>
+
+      <!-- YouTube URL -->
+      <div>
+        <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">YouTube Video URL (optional)</label>
+        <input type="url" name="videoUrl" value="<%= post.videoUrl || '' %>"
+          class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white" />
+      </div>
+
+      <!-- Rich Text Editor -->
+      <div>
+        <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Post Content</label>
+        <div id="editor" class="bg-white dark:bg-gray-900 dark:text-white p-2 border rounded min-h-[200px]">
+          <!-- This will be filled in by Quill -->
+        </div>
+        <textarea name="content" id="content" hidden></textarea>
+      </div>
+
+      <!-- Existing Image Preview -->
       <% if (post.media) { %>
-        <img src="<%= post.media %>" alt="Current image" style="max-width: 300px; border-radius: 6px; margin-bottom: 0.5rem;">
-      <% } else { %>
-        <p>No image uploaded</p>
+        <div>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Current Image:</p>
+          <img src="<%= post.media %>" alt="Post Image"
+            class="w-full h-auto max-h-64 object-contain rounded border" />
+        </div>
       <% } %>
-    </div>
 
-    <div class="form-group">
-      <label for="media">🖼 Replace Image</label>
-      <input type="file" name="media" id="media" accept="image/*">
-    </div>
+      <!-- Optional Media Upload -->
+      <div>
+        <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Replace Media (optional)</label>
+        <input type="file" name="media"
+          class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white" />
+      </div>
 
-    <div class="form-group">
-      <label for="content">📝 Post Content (Markdown)</label>
-      <textarea name="content" id="content" rows="10" required><%= post.content %></textarea>
-    </div>
+      <!-- Buttons -->
+      <div class="flex justify-between">
+        <a href="/admin"
+          class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition">Cancel</a>
+        <button type="submit"
+          class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">💾 Save Changes</button>
+      </div>
+    </form>
+  </section>
 
-    <button type="submit" class="submit-btn">💾 Update Post</button>
-  </form>
+  <!-- Quill Scripts & Styles -->
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
-  <!-- 🔎 Live Markdown Preview -->
-  <div class="preview-box">
-    <h3>🔎 Live Preview</h3>
-    <div id="livePreview" class="post-preview"></div>
-  </div>
-</main>
+  <!-- Init Script -->
+  <script>
+    const quill = new Quill('#editor', {
+      theme: 'snow',
+      placeholder: 'Write something great...',
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, false] }],
+          ['bold', 'italic', 'underline'],
+          ['link', 'image'],
+          [{ list: 'ordered' }, { list: 'bullet' }]
+        ]
+      }
+    });
 
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
-<script>
-  const contentInput = document.getElementById('content');
-  const preview = document.getElementById('livePreview');
+    // Load existing content
+    const initialContent = `<%- post.content.replace(/`/g, '\\`') %>`;
+    quill.root.innerHTML = initialContent;
 
-  contentInput?.addEventListener('input', () => {
-    const raw = contentInput.value;
-    preview.innerHTML = DOMPurify.sanitize(marked.parse(raw));
-  });
-
-  // Trigger preview on page load
-  window.addEventListener('DOMContentLoaded', () => {
-    if (contentInput.value) {
-      preview.innerHTML = DOMPurify.sanitize(marked.parse(contentInput.value));
-    }
-  });
-</script>
-
-<%- include('partials/footer') %>
+    // Sync with hidden textarea on form submit
+    document.querySelector('form').addEventListener('submit', function () {
+      document.getElementById('content').value = quill.root.innerHTML;
+    });
+  </script>
+</body>
+</html>
+ <%- include('partials/footer') %>
