@@ -125,8 +125,8 @@ html.dark .post-card {
 /* === Thumbnail Image (Cards & Posts) === */
 .thumbnail,
 .post-image {
-  max-width: 180px;
-  max-height: 120px;
+  max-width: 350px;
+  max-height: 300px;
   width: 100%;
   height: auto;
   object-fit: cover;
