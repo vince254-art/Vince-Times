@@ -154,6 +154,9 @@ html.dark .post-card {
   border-radius: 12px;
   margin-bottom: 1rem;
 }
+.admin-posts-section {
+  background-color: #f9fafb;
+}
 
 /* === Search Box === */
 .search-form {
