@@ -13,7 +13,7 @@
     <% } %>
   </div>
 
-  <!-- 📷 Featured Image (from Cloudinary) -->
+  <!-- 📷 Featured Image -->
   <% if (post.media) { %>
     <img src="<%= post.media %>" alt="<%= post.title %>" class="post-image">
   <% } %>
@@ -36,35 +36,31 @@
 
     <% if (post.comments && post.comments.length > 0) { %>
       <% post.comments.forEach(function(comment) { %>
-        <% if (comment.status === 'approved') { %>
-          <div class="comment">
-            <div class="comment-header">
-              <span class="comment-author"><%= comment.author %></span>
-              <% if (comment.flagged) { %>
-                <span class="flagged">🚩 Flagged</span>
-              <% } %>
-            </div>
-
-            <!-- 📝 Markdown-rendered Comment -->
-            <div class="comment-text" id="comment-<%= comment._id %>"></div>
-
-            <script>
-              const rawComment_<%= comment._id %> = `<%- comment.text ? comment.text.replace(/`/g, '\\`') : '' %>`;
-              document.addEventListener('DOMContentLoaded', () => {
-                const target = document.getElementById('comment-<%= comment._id %>');
-                if (target) {
-                  target.innerHTML = DOMPurify.sanitize(marked.parse(rawComment_<%= comment._id %>));
-                }
-              });
-            </script>
-
-            <!-- 🔼 Upvote -->
-            <div class="upvote-section">
-              <button class="upvote-btn" data-post-id="<%= post._id %>" data-comment-id="<%= comment._id %>">⬆ Upvote</button>
-              <span><%= comment.upvotes || 0 %> upvote<%= (comment.upvotes === 1) ? '' : 's' %></span>
-            </div>
+        <div class="comment">
+          <div class="comment-header">
+            <span class="comment-author"><%= comment.author %></span>
+            <% if (comment.flagged) { %>
+              <span class="flagged">🚩 Flagged</span>
+            <% } %>
           </div>
-        <% } %>
+
+          <div class="comment-text" id="comment-<%= comment._id %>"></div>
+
+          <script>
+            const rawComment_<%= comment._id %> = `<%- comment.text ? comment.text.replace(/`/g, '\\`') : '' %>`;
+            document.addEventListener('DOMContentLoaded', () => {
+              const target = document.getElementById('comment-<%= comment._id %>');
+              if (target) {
+                target.innerHTML = DOMPurify.sanitize(marked.parse(rawComment_<%= comment._id %>));
+              }
+            });
+          </script>
+
+          <div class="upvote-section">
+            <button class="upvote-btn" data-post-id="<%= post._id %>" data-comment-id="<%= comment._id %>">⬆ Upvote</button>
+            <span><%= comment.upvotes || 0 %> upvote<%= (comment.upvotes === 1) ? '' : 's' %></span>
+          </div>
+        </div>
       <% }); %>
     <% } else { %>
       <p class="no-comments">No comments yet. Be the first to share your thoughts!</p>

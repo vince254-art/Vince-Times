@@ -1,6 +1,6 @@
 /* === Base Layout === */
 .container {
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
   padding: 0 1.5rem;
   font-family: 'Inter', sans-serif;
@@ -336,4 +336,79 @@ html.dark a {
 }
 html.dark a:hover {
   color: #3b82f6;
+}
+
+/* === Global Responsive Enhancements === */
+
+/* Fluid text scaling */
+html {
+  font-size: 16px;
+}
+
+@media (max-width: 1024px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 13px;
+  }
+}
+
+/* Responsive container padding */
+.container {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+/* Make all images, videos, and embeds fluid by default */
+img,
+video,
+iframe {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Ensure long words don't break layout */
+* {
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Responsive footer stack fallback (in case JS is disabled) */
+@media (max-width: 640px) {
+  .footer-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+
+/* Prevent overflow in flex utilities */
+.items-center,
+.justify-between {
+  flex-wrap: wrap;
+}
+
+/* Ensure tables don't overflow on mobile */
+table {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
 }

@@ -1,57 +1,54 @@
 <footer class="site-footer">
-  <div class="container">
-    <div class="footer-grid">
+  <div class="container footer-grid">
+    <!-- About -->
+    <div>
+      <h3 class="footer-title">About Vince Times</h3>
+      <p class="text-sm leading-relaxed">
+        Vince-Times is your go-to platform for multimedia journalism — real-time news, deep dives, and stories that matter.<br>
+        Built with 💻 & ❤️ by Vince.
+      </p>
+    </div>
 
-      <!-- About -->
-      <div class="footer-section">
-        <h3 class="footer-title">About Vince Times</h3>
-        <p>
-          Vince-Times is your go-to platform for multimedia journalism — real-time news, deep dives, and stories that matter.
-          Built with 💻 & ❤️ by Vince.
-        </p>
-      </div>
+    <!-- Quick Links -->
+    <div>
+      <h3 class="footer-title">Quick Links</h3>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/?category=News">News</a></li>
+        <li><a href="/?category=Technology">Technology</a></li>
+        <li><a href="/?category=Politics">Politics</a></li>
+        <li><a href="/?category=Business">Business</a></li>
+        <li><a href="/?category=Sports">Sports</a></li>
+        <li><a href="/?category=Lifestyle">Lifestyle</a></li>
+        <li><a href="/?category=Entertainment">Entertainment</a></li>
+        <li><a href="/?category=Opinion">Opinion</a></li>
+        <li><a href="/media">Media Gallery</a></li>
+        <% if (loggedIn) { %>
+          <li><a href="/admin">Admin Dashboard</a></li>
+          <li><a href="/logout" class="text-red-500 hover:underline">Logout</a></li>
+        <% } else { %>
+          <li><a href="/login" class="text-green-500 hover:underline">Login</a></li>
+        <% } %>
+      </ul>
+    </div>
 
-      <!-- Quick Links -->
-      <div class="footer-section">
-        <h3 class="footer-title">Quick Links</h3>
-        <ul class="footer-links">
-          <li><a href="/">Home</a></li>
-          <li><a href="/?category=News">News</a></li>
-          <li><a href="/?category=Technology">Technology</a></li>
-          <li><a href="/?category=Politics">Politics</a></li>
-          <li><a href="/?category=Business">Business</a></li>
-          <li><a href="/?category=Sports">Sports</a></li>
-          <li><a href="/?category=Lifestyle">Lifestyle</a></li>
-          <li><a href="/?category=Entertainment">Entertainment</a></li>
-          <li><a href="/?category=Opinion">Opinion</a></li>
-          <li><a href="/media">Media Gallery</a></li>
-          <% if (loggedIn) { %>
-            <li><a href="/admin">Admin Dashboard</a></li>
-            <li><a href="/logout" class="logout-link">Logout</a></li>
-          <% } else { %>
-            <li><a href="/login" class="login-link">Login</a></li>
-          <% } %>
-        </ul>
-      </div>
-
-      <!-- Contact -->
-      <div class="footer-section">
-        <h3 class="footer-title">Get in Touch</h3>
-        <p>Got a story or a tip? Contact us:</p>
-        <p>📧 <a href="mailto:leintoivincent@gmail.com">vince-times.onrender.com</a></p>
-        <p>📍 Nairobi, Kenya</p>
-      </div>
-
+    <!-- Contact -->
+    <div>
+      <h3 class="footer-title">Get in Touch</h3>
+      <p class="text-sm">Got a story or a tip? Contact us:</p>
+      <p class="text-sm mt-2">
+        📧 <a href="mailto:leintoivincent@gmail.com" class="hover:text-blue-500">vince-times.onrender.com</a>
+      </p>
+      <p class="text-sm mt-2">📍 Nairobi, Kenya</p>
     </div>
   </div>
 
-  <div class="footer-bottom">
+  <div class="container footer-bottom">
     &copy; <%= new Date().getFullYear() %> Vince-Times. All rights reserved.
   </div>
 
-  <!-- Theme and Scroll Scripts -->
+  <!-- Theme + AOS Scripts -->
   <script>
-    // Restore theme from localStorage or system preference
     const storedTheme = localStorage.getItem("theme");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     document.documentElement.classList.toggle("dark", storedTheme === "dark" || (!storedTheme && prefersDark));
@@ -61,7 +58,6 @@
       localStorage.setItem("theme", isDark ? "dark" : "light");
     }
 
-    // Scroll fade-in animation
     const fadeEls = document.querySelectorAll('.fade-in');
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
@@ -70,7 +66,6 @@
     }, { threshold: 0.1 });
 
     fadeEls.forEach(el => observer.observe(el));
-     AOS.init({ duration: 800, once: true });
+    AOS.init({ duration: 800, once: true });
   </script>
 </footer>
-

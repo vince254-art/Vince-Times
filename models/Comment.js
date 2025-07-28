@@ -6,8 +6,8 @@ const commentSchema = new mongoose.Schema({
     required: true,
     ref: 'Post'
   },
-  name: String,
-  comment: String,
+  author: String,
+  text: String,
   status: {
     type: String,
     default: 'approved'
