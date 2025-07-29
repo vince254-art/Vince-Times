@@ -6,9 +6,14 @@ const postSchema = new mongoose.Schema({
   content: String,
   videoUrl: String,
   media: String,
+  caption: String, // optional: caption for image/video
+  author: {
+    type: String,
+    default: 'Admin'
+  },
   date: {
     type: Date,
-    default: Date.now,
+    default: Date.now
   }
 });
 

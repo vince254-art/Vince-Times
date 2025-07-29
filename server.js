@@ -7,7 +7,6 @@ const multer = require('multer');
 const { storage } = require('./cloudinary');
 
 const upload = multer({ storage });
-
 const Post = require('./models/Post');
 const Comment = require('./models/Comment');
 
@@ -16,30 +15,31 @@ const PORT = process.env.PORT || 3000;
 
 // ✅ MongoDB connection
 mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 }).then(() => console.log('✅ Connected to MongoDB'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// Middleware
+// ✅ Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
-// Sessions
+// ✅ Sessions
 app.use(session({
   secret: 'super-secret-key',
   resave: false,
   saveUninitialized: true
 }));
 
-// Auth Middleware
+// ✅ Auth Middleware
 const requireLogin = (req, res, next) => {
   if (req.session.loggedIn) next();
   else res.redirect('/login');
 };
 
-// Home Page
+// ✅ Home Page
 app.get('/', async (req, res) => {
   const { search = '', category = '' } = req.query;
   const filter = {
@@ -56,20 +56,27 @@ app.get('/', async (req, res) => {
   });
 });
 
-// Single Post Page
+// ✅ Single Post Page
 app.get('/post/:id', async (req, res) => {
   const post = await Post.findById(req.params.id).lean();
   if (!post) return res.status(404).send('Post not found');
 
   const comments = await Comment.find({ postId: post._id, status: 'approved' }).sort({ _id: -1 }).lean();
+
+  const relatedPosts = await Post.find({
+    _id: { $ne: post._id },
+    category: post.category
+  }).limit(3).lean();
+
   res.render('post', {
     post: { ...post, comments },
+    relatedPosts,
     loggedIn: req.session.loggedIn,
     title: post.title
   });
 });
 
-// Add Comment
+// ✅ Add Comment
 app.post('/post/:postId/comment', async (req, res) => {
   const newComment = new Comment({
     postId: req.params.postId,
@@ -83,13 +90,13 @@ app.post('/post/:postId/comment', async (req, res) => {
   res.redirect('/post/' + req.params.postId);
 });
 
-// Flag Comment
+// ✅ Flag Comment
 app.post('/post/:postId/comment/:commentId/flag', async (req, res) => {
   await Comment.findByIdAndUpdate(req.params.commentId, { flagged: true });
   res.redirect('/post/' + req.params.postId);
 });
 
-// Upvote Comment
+// ✅ Upvote Comment
 app.post('/post/:postId/comment/:commentId/upvote', async (req, res) => {
   const comment = await Comment.findById(req.params.commentId);
   if (comment) {
@@ -100,18 +107,18 @@ app.post('/post/:postId/comment/:commentId/upvote', async (req, res) => {
   res.json({ success: false });
 });
 
-// Admin Dashboard
+// ✅ Admin Dashboard
 app.get('/admin', requireLogin, async (req, res) => {
   const posts = await Post.find().sort({ date: -1 });
   res.render('admin', { posts, loggedIn: true, title: 'Admin – Vince Times' });
 });
 
-// New Post Page
+// ✅ New Post Page
 app.get('/admin/new', requireLogin, (req, res) => {
   res.render('new-post', { loggedIn: true, title: 'New Post – Vince Times' });
 });
 
-// Create Post with Cloudinary image
+// ✅ Create Post
 app.post('/admin/new', requireLogin, upload.single('media'), async (req, res) => {
   const newPost = new Post({
     title: req.body.title,
@@ -119,39 +126,46 @@ app.post('/admin/new', requireLogin, upload.single('media'), async (req, res) =>
     videoUrl: req.body.videoUrl || '',
     content: req.body.content,
     date: new Date(),
-    media: req.file ? req.file.path : ''  // ✅ Cloudinary URL
+    media: req.file ? req.file.path : '',
+    author: req.body.author || 'Admin',
+    caption: req.body.caption || ''
   });
   await newPost.save();
   res.redirect('/admin');
 });
 
-// Edit Post
+// ✅ Edit Post Page
 app.get('/admin/edit/:id', requireLogin, async (req, res) => {
   const post = await Post.findById(req.params.id);
   if (!post) return res.status(404).send('Post not found');
   res.render('edit-post', { post, loggedIn: true, title: 'Edit Post – Vince Times' });
 });
 
-// Update Post (with optional media update)
+// ✅ Update Post (with correct author handling)
 app.post('/admin/edit/:id', requireLogin, upload.single('media'), async (req, res) => {
-  const updates = {
-    title: req.body.title,
-    category: req.body.category,
-    videoUrl: req.body.videoUrl || '',
-    content: req.body.content
-  };
-  if (req.file) updates.media = req.file.path; // ✅ Cloudinary path
-  await Post.findByIdAndUpdate(req.params.id, updates);
+  const post = await Post.findById(req.params.id);
+  if (!post) return res.status(404).send('Post not found');
+
+  post.title = req.body.title;
+  post.category = req.body.category;
+  post.videoUrl = req.body.videoUrl || '';
+  post.content = req.body.content;
+  post.author = req.body.author?.trim() || post.author;
+  post.caption = req.body.caption || '';
+
+  if (req.file) post.media = req.file.path;
+
+  await post.save();
   res.redirect('/admin');
 });
 
-// Delete Post
+// ✅ Delete Post
 app.post('/admin/delete/:id', requireLogin, async (req, res) => {
   await Post.findByIdAndDelete(req.params.id);
   res.redirect('/admin');
 });
 
-// Comment Moderation Panel
+// ✅ Moderate Comments
 app.get('/admin/comments', requireLogin, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const perPage = 10;
@@ -180,7 +194,7 @@ app.post('/admin/comments/:id/flag', requireLogin, async (req, res) => {
   res.redirect('/admin/comments');
 });
 
-// Login
+// ✅ Login
 app.get('/login', (req, res) => {
   res.render('login', { loggedIn: req.session.loggedIn, title: 'Login – Vince Times' });
 });
@@ -199,8 +213,8 @@ app.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'));
 });
 
-// 404
+// ✅ 404 Fallback
 app.use((_, res) => res.status(404).send('Page not found'));
 
-// Start Server
+// ✅ Start Server
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));

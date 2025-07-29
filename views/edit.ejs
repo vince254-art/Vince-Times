@@ -1,4 +1,4 @@
-<form action="/admin/edit/<%= post.id %>" method="POST" enctype="multipart/form-data"
+<form action="/admin/edit/<%= post._id %>" method="POST" enctype="multipart/form-data"
   class="bg-white dark:bg-gray-800 p-6 rounded shadow space-y-6">
 
   <!-- Title -->
@@ -8,7 +8,14 @@
       class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white" />
   </div>
 
-  <!-- Category (Dropdown) -->
+  <!-- Author -->
+  <div>
+    <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Author</label>
+    <input type="text" name="author" value="<%= post.author || '' %>" placeholder="Author name"
+      class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white" />
+  </div>
+
+  <!-- Category Dropdown -->
   <div>
     <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Category</label>
     <select name="category" required
@@ -20,7 +27,7 @@
     </select>
   </div>
 
-  <!-- YouTube URL -->
+  <!-- YouTube Video URL -->
   <div>
     <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">YouTube Video URL (optional)</label>
     <input type="url" name="videoUrl" value="<%= post.videoUrl || '' %>"
@@ -35,10 +42,10 @@
   </div>
 
   <!-- Existing Media Preview -->
-  <% if (post.image) { %>
+  <% if (post.media) { %>
     <div>
-      <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Current Image:</p>
-      <img src="<%= post.image %>" alt="Post Image"
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Current Media:</p>
+      <img src="<%= post.media %>" alt="Post Media"
         class="w-full h-auto max-h-64 object-contain rounded border" />
     </div>
   <% } %>
@@ -46,11 +53,11 @@
   <!-- Optional Media Upload -->
   <div>
     <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Replace Media (optional)</label>
-    <input type="file" name="image"
+    <input type="file" name="media"
       class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white" />
   </div>
 
-  <!-- Buttons -->
+  <!-- Action Buttons -->
   <div class="flex justify-between">
     <a href="/admin" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition">Cancel</a>
     <button type="submit"

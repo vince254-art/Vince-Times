@@ -15,6 +15,14 @@
         <input type="text" name="title" value="<%= post.title %>" required
           class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white" />
       </div>
+      
+        <!-- Author -->
+      <div>
+        <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200" for="author">Author</label>
+        <input type="text" id="author" name="author" value="<%= post.author || '' %>" placeholder="Author name"
+          class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white" />
+      </div>
+
 
       <!-- Category Dropdown -->
 <div>
