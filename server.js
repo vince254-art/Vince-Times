@@ -56,7 +56,7 @@ app.get('/', async (req, res) => {
   });
 });
 
-// ✅ Single Post Page
+// ✅ Single Post Page (with formatted date)
 app.get('/post/:id', async (req, res) => {
   const post = await Post.findById(req.params.id).lean();
   if (!post) return res.status(404).send('Post not found');
@@ -67,6 +67,18 @@ app.get('/post/:id', async (req, res) => {
     _id: { $ne: post._id },
     category: post.category
   }).limit(3).lean();
+
+  // ✅ Format date to Nairobi timezone with AM/PM
+  const options = {
+    timeZone: 'Africa/Nairobi',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  };
+  post.formattedDate = new Date(post.date).toLocaleString('en-KE', options);
 
   res.render('post', {
     post: { ...post, comments },
@@ -141,7 +153,7 @@ app.get('/admin/edit/:id', requireLogin, async (req, res) => {
   res.render('edit-post', { post, loggedIn: true, title: 'Edit Post – Vince Times' });
 });
 
-// ✅ Update Post (with correct author handling)
+// ✅ Update Post
 app.post('/admin/edit/:id', requireLogin, upload.single('media'), async (req, res) => {
   const post = await Post.findById(req.params.id);
   if (!post) return res.status(404).send('Post not found');
@@ -175,6 +187,7 @@ app.get('/admin/comments', requireLogin, async (req, res) => {
     .skip((page - 1) * perPage)
     .limit(perPage)
     .lean();
+
   res.render('admin-comments', {
     comments,
     currentPage: page,
@@ -184,11 +197,13 @@ app.get('/admin/comments', requireLogin, async (req, res) => {
   });
 });
 
+// ✅ Delete Comment
 app.post('/admin/comments/:id/delete', requireLogin, async (req, res) => {
   await Comment.findByIdAndDelete(req.params.id);
   res.redirect('/admin/comments');
 });
 
+// ✅ Flag Comment (admin side)
 app.post('/admin/comments/:id/flag', requireLogin, async (req, res) => {
   await Comment.findByIdAndUpdate(req.params.id, { flagged: true });
   res.redirect('/admin/comments');
@@ -209,6 +224,7 @@ app.post('/login', (req, res) => {
   }
 });
 
+// ✅ Logout
 app.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'));
 });

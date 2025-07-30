@@ -9,7 +9,9 @@
   <div class="post-meta">
     <span class="category-badge"><%= post.category %></span>
      <p>By <span class="font-medium"><%= post.author || 'Vincent Leintoi' %></span></p>
-      <p>Published on <time datetime="<%= post.date %>"><%= new Date(post.date).toLocaleString() %></time></p>
+  <p class="text-sm text-gray-600 dark:text-gray-400">
+  Published on <time datetime="<%= post.date.toISOString() %>"><%= post.formattedDate %></time>
+</p>
     </div>
         <span>•</span>
         <span><%= Math.ceil((post.content.replace(/<[^>]+>/g, '').split(/\s+/).length || 0) / 200) %> min read</span>
