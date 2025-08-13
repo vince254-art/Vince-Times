@@ -8,14 +8,13 @@
   <!-- 📅 Metadata -->
   <div class="post-meta">
     <span class="category-badge"><%= post.category %></span>
-     <p>By <span class="font-medium"><%= post.author || 'Vincent Leintoi' %></span></p>
-  <p class="text-sm text-gray-600 dark:text-gray-400">
-  Published on <time datetime="<%= post.date.toISOString() %>"><%= post.formattedDate %></time>
-</p>
-    </div>
-        <span>•</span>
-        <span><%= Math.ceil((post.content.replace(/<[^>]+>/g, '').split(/\s+/).length || 0) / 200) %> min read</span>
-      </div>
+    <p>By <span class="font-medium"><%= post.author || 'Vincent Leintoi' %></span></p>
+    <p class="text-sm text-gray-600 dark:text-gray-400">
+      Published on <time datetime="<%= post.date.toISOString() %>"><%= post.formattedDate %></time>
+    </p>
+    <span>•</span>
+    <span><%= Math.ceil((post.content.replace(/<[^>]+>/g, '').split(/\s+/).length || 0) / 200) %> min read</span>
+  </div>
 
   <!-- 📷 Featured Image -->
   <% if (post.media) { %>
@@ -33,18 +32,31 @@
   <article class="post-content">
     <%- post.content %>
   </article>
+
   <!-- 📚 Related Posts -->
   <% if (relatedPosts && relatedPosts.length > 0) { %>
-    <section class="mt-16 border-t pt-10">
+    <section class="mt-16 border-t pt-10 max-w-[25vw]">
       <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">📚 Related Posts</h2>
-      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="grid gap-6">
         <% relatedPosts.forEach(rp => { %>
-          <a href="/post/<%= rp._id %>" class="block rounded-lg overflow-hidden shadow-md hover:shadow-xl bg-white dark:bg-gray-800 transition duration-300">
-            <% if (rp.media) { %>
-              <img src="<%= rp.media %>" alt="<%= rp.title %>" class="w-full h-40 object-cover" />
-            <% } else { %>
-              <div class="w-full h-40 bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 italic">No image</div>
-            <% } %>
+          <a href="/post/<%= rp._id %>"
+             class="block rounded-[16px] overflow-hidden shadow-md hover:shadow-xl bg-white dark:bg-gray-800 transition duration-300">
+
+            <!-- Thumbnail -->
+            <div class="flex justify-center">
+              <% if (rp.media) { %>
+                <img src="<%= rp.media %>" alt="<%= rp.title %>"
+                     class="rounded-[16px] object-cover"
+                     style="width:300px; height:200px;" />
+              <% } else { %>
+                <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 italic rounded-[16px]"
+                     style="width:300px; height:200px;">
+                  No image
+                </div>
+              <% } %>
+            </div>
+
+            <!-- Info -->
             <div class="p-4">
               <h3 class="text-lg font-semibold mb-1 text-gray-800 dark:text-white"><%= rp.title %></h3>
               <p class="text-sm text-gray-600 dark:text-gray-300">
@@ -59,7 +71,7 @@
       </div>
     </section>
   <% } %>
-  
+
   <!-- 💬 Comments -->
   <section id="comments" class="comments-section">
     <h2 class="section-heading">💬 Comments</h2>
