@@ -1,54 +1,56 @@
-<%- include('partials/head', { title }) %>
+<%- include('partials/head', { title: 'Moderate Comments' }) %>
 <%- include('partials/navbar') %>
 
-<main class="admin-comments-container">
-  <h1>💬 Moderate Comments</h1>
+<main class="container space-y-10" data-aos="fade-up">
+  <h1 class="page-title">💬 Moderate Comments</h1>
 
   <% if (comments.length === 0) { %>
-    <p>No comments to display.</p>
+    <p class="text-gray-500">No comments to display.</p>
   <% } else { %>
-    <% comments.forEach(comment => { %>
-      <div class="comment">
-        <div class="comment-header">
-          <strong><%= comment.author %></strong>
-          <% if (comment.flagged) { %>
-            <span class="flagged">🚩 Flagged</span>
-          <% } %>
-        </div>
-        <div class="comment-text" id="comment-<%= comment._id %>"></div>
-        <div class="comment-actions">
-          <form action="/admin/comments/<%= comment._id %>/flag" method="POST">
-            <button type="submit" class="flag-btn">🚩 Flag</button>
-          </form>
-          <form action="/admin/comments/<%= comment._id %>/delete" method="POST" onsubmit="return confirm('Delete this comment?')">
-            <button type="submit" class="delete-btn">🗑 Delete</button>
-          </form>
-        </div>
+    <section class="space-y-6">
+      <% comments.forEach(comment => { %>
+        <div class="card space-y-2" id="comment-<%= comment._id %>">
+          <div class="text-sm text-gray-600">
+            <strong><%= comment.author || 'Anonymous' %></strong>
+            <% if (comment.flagged) { %>
+              <span class="text-red-500 ml-2">🚩 Flagged</span>
+            <% } %>
+            &middot;
+            <%= new Date(comment.date || comment.createdAt).toLocaleString() %>
+          </div>
 
-        <script>
-          document.addEventListener('DOMContentLoaded', () => {
-            const raw = `<%- comment.text.replace(/`/g, '\\`') %>`;
-            const el = document.getElementById('comment-<%= comment._id %>');
-            if (el) el.innerHTML = DOMPurify.sanitize(marked.parse(raw));
-          });
-        </script>
-      </div>
-    <% }); %>
+          <!-- Rendered Markdown -->
+          <div class="comment-body text-gray-800 dark:text-gray-200">
+            <%- comment.text ? comment.text : '<em>No comment text</em>' %>
+          </div>
+
+          <div class="flex gap-3 mt-2">
+            <form action="/admin/comments/<%= comment._id %>/flag" method="POST">
+              <button type="submit" class="button bg-yellow-500 text-white hover:bg-yellow-600">🚩 Flag</button>
+            </form>
+            <form action="/admin/comments/<%= comment._id %>/delete" method="POST" onsubmit="return confirm('Delete this comment?')">
+              <button type="submit" class="button bg-red-600 text-white hover:bg-red-700">🗑 Delete</button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
+    </section>
+
+    <!-- Pagination -->
+    <div class="pagination mt-10 flex items-center justify-between">
+      <% if (currentPage > 1) { %>
+        <a href="?page=<%= currentPage - 1 %>" class="pagination-btn">⬅ Prev</a>
+      <% } else { %>
+        <span></span>
+      <% } %>
+      <span class="current-page">Page <%= currentPage %> of <%= totalPages %></span>
+      <% if (currentPage < totalPages) { %>
+        <a href="?page=<%= currentPage + 1 %>" class="pagination-btn">Next ➡</a>
+      <% } else { %>
+        <span></span>
+      <% } %>
+    </div>
   <% } %>
-
-  <!-- Pagination -->
-  <div class="pagination">
-    <% if (currentPage > 1) { %>
-      <a href="?page=<%= currentPage - 1 %>" class="pagination-btn">⬅ Prev</a>
-    <% } %>
-    <span class="current-page">Page <%= currentPage %> of <%= totalPages %></span>
-    <% if (currentPage < totalPages) { %>
-      <a href="?page=<%= currentPage + 1 %>" class="pagination-btn">Next ➡</a>
-    <% } %>
-  </div>
 </main>
-
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
 
 <%- include('partials/footer') %>

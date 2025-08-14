@@ -1,23 +1,29 @@
 <%- include('partials/head', { title: 'Admin Dashboard' }) %>
 <%- include('partials/navbar') %>
 
-<main data-aos="fade-up" class="container fade-in space-y-10">
+<nav class="admin-nav">
+  <a href="/admin/comments" title="View and delete user comments">Moderate Comments🚮</a>
+</nav>
 
-  <h1 class="page-title">🛠 Admin Dashboard</h1>
+<main data-aos="fade-up" class="container fade-in space-y-10">
+  <h1 class="page-title">
+    Admin Dashboard 😎
+  </h1>
 
   <!-- ➕ Create New Post -->
   <form action="/admin/new" method="POST" enctype="multipart/form-data" class="card space-y-4">
-    <h2 class="section-title">➕ New Post</h2>
+    <h2 class="section-title">New Post🆕</h2>
 
     <div>
       <label class="form-label" for="title">Post Title</label>
       <input type="text" id="title" name="title" placeholder="Post Title" required class="form-input" />
     </div>
-     <div>
-       <label class="form-label" for="author">Author</label>
-    <input type="text" id="author" name="author" placeholder="Author name" class="form-input" />
 
+    <div>
+      <label class="form-label" for="author">Author</label>
+      <input type="text" id="author" name="author" placeholder="Author name" class="form-input" />
     </div>
+
     <div>
       <label class="form-label">Content</label>
       <div id="editor" class="editor"></div>
@@ -49,46 +55,44 @@
       <input type="file" name="media" id="media" class="form-input" />
     </div>
 
-    <button type="submit" class="button">📤 Publish Post</button>
+    <button type="submit" class="button">Publish Post🖨️</button>
   </form>
 
   <!-- 📰 List of Posts -->
   <section class="space-y-6">
-    <h2 class="section-title">📰 Your Posts</h2>
-<% posts.forEach(post => { %>
-  <div class="bg-white dark:bg-gray-900 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-5">
-    <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white"><%= post.title %></h3>
-        <p class="text-sm text-gray-600 dark:text-gray-400">
-          <span class="inline-block bg-gray-200 text-gray-800 px-2 py-0.5 rounded text-xs font-medium dark:bg-gray-700 dark:text-gray-100">
-            <%= post.category || 'Uncategorized' %>
-          </span>
-          &middot;
-          <%= new Date(post.date || post.createdAt || post.id).toLocaleDateString() %>
-        </p>
+    <h2 class="section-title">Post Page📥</h2>
+    <% posts.forEach(post => { %>
+      <div class="bg-white dark:bg-gray-900 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-5">
+        <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white"><%= post.title %></h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              <span class="inline-block bg-gray-200 text-gray-800 px-2 py-0.5 rounded text-xs font-medium dark:bg-gray-700 dark:text-gray-100">
+                <%= post.category || 'Uncategorized' %>
+              </span>
+              &middot;
+              <%= new Date(post.date || post.createdAt || post.id).toLocaleDateString() %>
+            </p>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap gap-3 mt-4 ml-auto sm:ml-0 sm:justify-end">
+          <a href="/post/<%= post.id %>" class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+            View
+          </a>
+          <a href="/admin/edit/<%= post.id %>" class="px-3 py-1 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">
+            Edit
+          </a>
+          <form action="/admin/delete/<%= post.id %>" method="POST" onsubmit="return confirm('Are you sure?')" class="inline">
+            <button type="submit" class="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition">
+              Delete
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="flex flex-wrap gap-3 mt-4 ml-auto sm:ml-0 sm:justify-end">
-      <a href="/post/<%= post.id %>" class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-        View
-      </a>
-      <a href="/admin/edit/<%= post.id %>" class="px-3 py-1 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">
-        Edit
-      </a>
-      <form action="/admin/delete/<%= post.id %>" method="POST" onsubmit="return confirm('Are you sure?')" class="inline">
-        <button type="submit" class="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition">
-          Delete
-        </button>
-      </form>
-    </div>
-  </div>
-<% }) %>
-
+    <% }) %>
   </section>
-
 </main>
 
 <%- include('partials/footer') %>
@@ -109,7 +113,7 @@
       ]
     }
   });
-
+ 
   document.querySelector('form').addEventListener('submit', function () {
     document.getElementById('content').value = quill.root.innerHTML;
   });

@@ -36,7 +36,7 @@
   <!-- 📚 Related Posts -->
   <% if (relatedPosts && relatedPosts.length > 0) { %>
     <section class="mt-16 border-t pt-10 max-w-[25vw]">
-      <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">📚 Related Posts</h2>
+      <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">Related Posts📑</h2>
       <div class="grid gap-6">
         <% relatedPosts.forEach(rp => { %>
           <a href="/post/<%= rp._id %>"
@@ -118,7 +118,7 @@
         <label for="wysiwyg">💬 Your Comment</label>
         <textarea name="text" id="wysiwyg" required placeholder="Write in **Markdown**..." rows="5"></textarea>
       </div>
-      <button type="submit" class="submit-btn">➕ Add Comment</button>
+      <button type="submit" class="submit-btn">Add Comment🆕</button>
     </form>
 
     <!-- 🔎 Live Markdown Preview -->
@@ -129,9 +129,9 @@
 
     <!-- 📤 Share Buttons -->
     <div class="share-buttons">
-      <a href="https://twitter.com/intent/tweet?text=<%= encodeURIComponent(post.title) %>&url=https://vincetimes.com/post/<%= post._id %>" target="_blank">🐦</a>
-      <a href="https://www.facebook.com/sharer/sharer.php?u=https://vincetimes.com/post/<%= post._id %>" target="_blank">📘</a>
-      <a href="mailto:?subject=<%= encodeURIComponent(post.title) %>&body=Check this out: https://vincetimes.com/post/<%= post._id %>">✉️</a>
+      <a href="https://twitter.com/intent/tweet?text=<%= encodeURIComponent(post.title) %>&url=https://vincetimes.com/post/<%= post._id %>" target="_blank">🦅</a>
+      <a href="https://www.facebook.com/sharer/sharer.php?u=https://vincetimes.com/post/<%= post._id %>" target="_blank">🫠</a>
+      <a href="mailto:?subject=<%= encodeURIComponent(post.title) %>&body=Check this out: https://vincetimes.com/post/<%= post._id %>">📧</a>
     </div>
   </section>
 </main>
