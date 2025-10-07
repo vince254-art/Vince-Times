@@ -35,14 +35,12 @@
     <!-- Contact -->
     <div>
       <h3 class="footer-title">Get in Touch</h3>
-      <p class="text-sm">Got a story or a tip? Contact us:</p>
+      <p class="text-sm">Got a story or a tip? Email us on:</p>
       <p class="text-sm mt-2">
         📧 <a href="mailto:leintoivincent@gmail.com" class="hover:text-blue-500">leintoivincent@gmail.com</a>
       </p>
       <p class="text-sm mt-2">📍 Nairobi, Kenya</p>
-       <span>
-        Contact us on:
-       </span>
+      <span>Contact us on:</span>
       <div class="flex flex-wrap gap-4 text-xl mt-5">
         <a href="https://facebook.com/LeintoiVincent" target="_blank" class="hover:text-blue-600"><i class="fab fa-facebook"></i></a>
         <a href="https://x.com/LeintoiVincent" target="_blank" class="hover:text-gray-400"><i class="fab fa-x-twitter"></i></a>
@@ -57,26 +55,33 @@
   <div class="container footer-bottom">
     &copy; <%= new Date().getFullYear() %> Vince-Times. All rights reserved.
   </div>
-
-  <!-- Theme + AOS Scripts -->
-  <script>
-    const storedTheme = localStorage.getItem("theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    document.documentElement.classList.toggle("dark", storedTheme === "dark" || (!storedTheme && prefersDark));
-
-    function toggleTheme() {
-      const isDark = document.documentElement.classList.toggle("dark");
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-    }
-
-    const fadeEls = document.querySelectorAll('.fade-in');
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('visible');
-      });
-    }, { threshold: 0.1 });
-
-    fadeEls.forEach(el => observer.observe(el));
-    AOS.init({ duration: 800, once: true });
-  </script>
 </footer>
+
+<!-- ✅ AOS Fix: Properly placed outside script -->
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+<script>
+  // Theme Toggle
+  const storedTheme = localStorage.getItem("theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.classList.toggle("dark", storedTheme === "dark" || (!storedTheme && prefersDark));
+
+  function toggleTheme() {
+    const isDark = document.documentElement.classList.toggle("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  }
+
+  // Fade-in animation observer
+  const fadeEls = document.querySelectorAll('.fade-in');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+
+  fadeEls.forEach(el => observer.observe(el));
+
+  // Initialize AOS
+  AOS.init({ duration: 800, once: true });
+</script>
