@@ -198,3 +198,9 @@ html.dark .form-input {
 .inline-form {
   display: inline;
 }
+.share-buttons a {
+  transition: transform 0.2s ease;
+}
+.share-buttons a:hover {
+  transform: scale(1.15);
+}

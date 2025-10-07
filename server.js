@@ -5,19 +5,20 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const { storage } = require('./cloudinary');
-
 const upload = multer({ storage });
+
 const Post = require('./models/Post');
 const Comment = require('./models/Comment');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ MongoDB connection
+// ✅ MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => console.log('✅ Connected to MongoDB'))
+  useUnifiedTopology: true,
+})
+  .then(() => console.log('✅ Connected to MongoDB'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
 // ✅ Middleware
@@ -30,13 +31,13 @@ app.set('view engine', 'ejs');
 app.use(session({
   secret: 'super-secret-key',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
 }));
 
 // ✅ Auth Middleware
 const requireLogin = (req, res, next) => {
-  if (req.session.loggedIn) next();
-  else res.redirect('/login');
+  if (req.session.loggedIn) return next();
+  res.redirect('/login');
 };
 
 // ✅ Home Page
@@ -44,7 +45,7 @@ app.get('/', async (req, res) => {
   const { search = '', category = '' } = req.query;
   const filter = {
     ...(search && { title: { $regex: search, $options: 'i' } }),
-    ...(category && { category })
+    ...(category && { category }),
   };
   const posts = await Post.find(filter).sort({ date: -1 });
   res.render('index', {
@@ -52,23 +53,26 @@ app.get('/', async (req, res) => {
     search,
     category,
     loggedIn: req.session.loggedIn,
-    title: 'Vince Times'
+    title: 'Vince Times',
   });
 });
 
-// ✅ Single Post Page (with formatted date)
+// ✅ Single Post Page
 app.get('/post/:id', async (req, res) => {
   const post = await Post.findById(req.params.id).lean();
   if (!post) return res.status(404).send('Post not found');
 
-  const comments = await Comment.find({ postId: post._id, status: 'approved' }).sort({ _id: -1 }).lean();
+  const comments = await Comment.find({
+    postId: post._id,
+    status: 'approved',
+  }).sort({ _id: -1 }).lean();
 
   const relatedPosts = await Post.find({
     _id: { $ne: post._id },
-    category: post.category
+    category: post.category,
   }).limit(3).lean();
 
-  // ✅ Format date to Nairobi timezone with AM/PM
+  // ✅ Format date to Nairobi timezone
   const options = {
     timeZone: 'Africa/Nairobi',
     year: 'numeric',
@@ -76,15 +80,17 @@ app.get('/post/:id', async (req, res) => {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: true
+    hour12: true,
   };
   post.formattedDate = new Date(post.date).toLocaleString('en-KE', options);
 
   res.render('post', {
-    post: { ...post, comments },
+    post,
+    comments,
     relatedPosts,
     loggedIn: req.session.loggedIn,
-    title: post.title
+    title: post.title,
+    requestUrl: req.protocol + '://' + req.get('host') + req.originalUrl,
   });
 });
 
@@ -96,7 +102,7 @@ app.post('/post/:postId/comment', async (req, res) => {
     text: req.body.text || '',
     status: 'approved',
     upvotes: 0,
-    flagged: false
+    flagged: false,
   });
   await newComment.save();
   res.redirect('/post/' + req.params.postId);
@@ -108,7 +114,7 @@ app.post('/post/:postId/comment/:commentId/flag', async (req, res) => {
   res.redirect('/post/' + req.params.postId);
 });
 
-// ✅ Upvote Comment
+// ✅ Upvote Comment (AJAX)
 app.post('/post/:postId/comment/:commentId/upvote', async (req, res) => {
   const comment = await Comment.findById(req.params.commentId);
   if (comment) {
@@ -140,7 +146,7 @@ app.post('/admin/new', requireLogin, upload.single('media'), async (req, res) =>
     date: new Date(),
     media: req.file ? req.file.path : '',
     author: req.body.author || 'Admin',
-    caption: req.body.caption || ''
+    caption: req.body.caption || '',
   });
   await newPost.save();
   res.redirect('/admin');
@@ -164,7 +170,6 @@ app.post('/admin/edit/:id', requireLogin, upload.single('media'), async (req, re
   post.content = req.body.content;
   post.author = req.body.author?.trim() || post.author;
   post.caption = req.body.caption || '';
-
   if (req.file) post.media = req.file.path;
 
   await post.save();
@@ -193,7 +198,7 @@ app.get('/admin/comments', requireLogin, async (req, res) => {
     currentPage: page,
     totalPages: Math.ceil(total / perPage),
     loggedIn: true,
-    title: 'Moderate Comments – Vince Times'
+    title: 'Moderate Comments – Vince Times',
   });
 });
 
