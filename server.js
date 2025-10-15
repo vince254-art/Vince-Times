@@ -6,10 +6,8 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 const { storage } = require('./cloudinary');
 const upload = multer({ storage });
-
 const Post = require('./models/Post');
 const Comment = require('./models/Comment');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 

@@ -76,8 +76,9 @@
   <section id="comments" class="comments-section">
     <h2 class="section-heading">💬 Comments</h2>
 
-    <% if (post.comments && post.comments.length > 0) { %>
-      <% post.comments.forEach(function(comment) { %>
+    <% if (comments && comments.length > 0) { %>
+  <% comments.forEach(function(comment) { %>
+
         <div class="comment">
           <div class="comment-header">
             <span class="comment-author"><%= comment.author %></span>
