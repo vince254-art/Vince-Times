@@ -145,10 +145,12 @@ app.post('/admin/new', requireLogin, upload.single('media'), async (req, res) =>
     media: req.file ? req.file.path : '',
     author: req.body.author || 'Admin',
     caption: req.body.caption || '',
+    photoCredit: req.body.photoCredit || '', // ✅ added
   });
   await newPost.save();
   res.redirect('/admin');
 });
+
 
 // ✅ Edit Post Page
 app.get('/admin/edit/:id', requireLogin, async (req, res) => {
@@ -168,6 +170,7 @@ app.post('/admin/edit/:id', requireLogin, upload.single('media'), async (req, re
   post.content = req.body.content;
   post.author = req.body.author?.trim() || post.author;
   post.caption = req.body.caption || '';
+  post.photoCredit = req.body.photoCredit || post.photoCredit; // ✅ added
   if (req.file) post.media = req.file.path;
 
   await post.save();

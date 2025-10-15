@@ -17,9 +17,20 @@
   </div>
 
   <!-- 📷 Featured Image -->
-  <% if (post.media) { %>
+ <% if (post.media) { %>
+  <figure class="my-8">
     <img src="<%= post.media %>" alt="<%= post.title %>" class="post-image">
-  <% } %>
+    <% if (post.caption || post.photoCredit) { %>
+      <figcaption class="image-caption text-sm text-gray-500 dark:text-gray-400 mt-2">
+        <%= post.caption || '' %>
+        <% if (post.photoCredit) { %>
+          <br><span class="photo-credit italic text-gray-500"><span>📷</span> <%= post.photoCredit %></span>
+        <% } %>
+      </figcaption>
+    <% } %>
+  </figure>
+<% } %>
+
 
   <!-- 📺 YouTube Embed -->
   <% if (post.videoUrl) { %>
@@ -132,64 +143,44 @@
 
 
     <!-- 📤 Share Buttons -->
-    <!-- Share Buttons -->
-<div class="mt-16 border-t border-gray-200 dark:border-gray-700 pt-12 space-x-8">
+<div class="mt-16 border-t border-gray-200 dark:border-gray-700 pt-12">
   <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">
     Share this post
-      </h3>
+  </h3>
 
-  <div class="mt-16 flex-wrap gap-4 text-2xl share-buttons space-x-8"></div> </div>
+  <div class="flex flex-wrap gap-6 text-2xl share-buttons">
     <!-- Facebook -->
-    <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(requestUrl) %>"
-       target="_blank"
-       rel="noopener noreferrer"
-       class="hover:text-blue-600">
+    <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(requestUrl) %>" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600">
       <i class="fab fa-facebook"></i>
     </a>
 
     <!-- Twitter / X -->
-    <a href="https://twitter.com/intent/tweet?url=<%= encodeURIComponent(requestUrl) %>&text=<%= encodeURIComponent(post.title) %>"
-       target="_blank"
-       rel="noopener noreferrer"
-       class="hover:text-gray-700 dark:hover:text-gray-300">
+    <a href="https://twitter.com/intent/tweet?url=<%= encodeURIComponent(requestUrl) %>&text=<%= encodeURIComponent(post.title) %>" target="_blank" rel="noopener noreferrer" class="hover:text-gray-700 dark:hover:text-gray-300">
       <i class="fab fa-x-twitter"></i>
     </a>
 
     <!-- WhatsApp -->
-    <a href="https://wa.me/?text=<%= encodeURIComponent(post.title + ' ' + requestUrl) %>"
-       target="_blank"
-       rel="noopener noreferrer"
-       class="hover:text-green-500">
+    <a href="https://wa.me/?text=<%= encodeURIComponent(post.title + ' ' + requestUrl) %>" target="_blank" rel="noopener noreferrer" class="hover:text-green-500">
       <i class="fab fa-whatsapp"></i>
     </a>
 
     <!-- LinkedIn -->
-    <a href="https://www.linkedin.com/shareArticle?mini=true&url=<%= encodeURIComponent(requestUrl) %>&title=<%= encodeURIComponent(post.title) %>"
-       target="_blank"
-       rel="noopener noreferrer"
-       class="hover:text-blue-700">
+    <a href="https://www.linkedin.com/shareArticle?mini=true&url=<%= encodeURIComponent(requestUrl) %>&title=<%= encodeURIComponent(post.title) %>" target="_blank" rel="noopener noreferrer" class="hover:text-blue-700">
       <i class="fab fa-linkedin"></i>
     </a>
 
     <!-- Telegram -->
-    <a href="https://t.me/share/url?url=<%= encodeURIComponent(requestUrl) %>&text=<%= encodeURIComponent(post.title) %>"
-       target="_blank"
-       rel="noopener noreferrer"
-       class="hover:text-sky-500">
+    <a href="https://t.me/share/url?url=<%= encodeURIComponent(requestUrl) %>&text=<%= encodeURIComponent(post.title) %>" target="_blank" rel="noopener noreferrer" class="hover:text-sky-500">
       <i class="fab fa-telegram"></i>
     </a>
 
     <!-- Reddit -->
-    <a href="https://reddit.com/submit?url=<%= encodeURIComponent(requestUrl) %>&title=<%= encodeURIComponent(post.title) %>"
-       target="_blank"
-       rel="noopener noreferrer"
-       class="hover:text-orange-600">
+    <a href="https://reddit.com/submit?url=<%= encodeURIComponent(requestUrl) %>&title=<%= encodeURIComponent(post.title) %>" target="_blank" rel="noopener noreferrer" class="hover:text-orange-600">
       <i class="fab fa-reddit"></i>
     </a>
 
     <!-- Email -->
-    <a href="mailto:?subject=<%= encodeURIComponent(post.title) %>&body=<%= encodeURIComponent(requestUrl) %>"
-       class="hover:text-gray-600 dark:hover:text-gray-400">
+    <a href="mailto:?subject=<%= encodeURIComponent(post.title) %>&body=<%= encodeURIComponent(requestUrl) %>" class="hover:text-gray-600 dark:hover:text-gray-400">
       <i class="fas fa-envelope"></i>
     </a>
   </div>

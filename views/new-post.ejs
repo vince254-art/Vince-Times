@@ -5,19 +5,20 @@
   <h1>Create a New Post 📝</h1>
 
   <form action="/admin/new" method="POST" enctype="multipart/form-data" class="post-form">
+
     <div class="form-group">
       <label for="title">📰 Title</label>
-      <input type="text" name="title" id="title" required>
+      <input type="text" name="title" id="title" placeholder="Enter post title..." required autofocus>
     </div>
 
     <div class="form-group">
       <label for="category">📂 Category</label>
-      <input type="text" name="category" id="category" required>
+      <input type="text" name="category" id="category" placeholder="e.g. Politics, Sports..." required>
     </div>
-    <div>
-       <label class="form-label" for="author">Author</label>
-    <input type="text" id="author" name="author" placeholder="Author name" class="form-input" />
 
+    <div class="form-group">
+      <label for="author">✍️ Author</label>
+      <input type="text" id="author" name="author" placeholder="Author name" required>
     </div>
 
     <div class="form-group">
@@ -27,7 +28,17 @@
 
     <div class="form-group">
       <label for="media">🖼 Upload Image (Cloudinary)</label>
-      <input type="file" name="media" id="media" accept="image/*">
+      <input type="file" name="media" id="media" accept="image/*" class="form-control">
+    </div>
+
+    <div class="form-group">
+      <label for="photoCredit">📸 Photo Credit</label>
+      <input 
+        type="text" 
+        name="photoCredit" 
+        id="photoCredit" 
+        placeholder="e.g. John Doe / Reuters"
+      >
     </div>
 
     <div class="form-group">

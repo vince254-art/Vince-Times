@@ -1,4 +1,3 @@
-
 <%- include('partials/head') %>
 <body>
   <%- include('partials/navbar') %>
@@ -15,26 +14,25 @@
         <input type="text" name="title" value="<%= post.title %>" required
           class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white" />
       </div>
-      
-        <!-- Author -->
+
+      <!-- Author -->
       <div>
         <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200" for="author">Author</label>
         <input type="text" id="author" name="author" value="<%= post.author || '' %>" placeholder="Author name"
           class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white" />
       </div>
 
-
       <!-- Category Dropdown -->
-<div>
-  <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Category</label>
-  <select name="category" required
-    class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white">
-    <% const categories = ['Technology', 'Lifestyle', 'Business', 'Entertainment', 'Sports', 'Politics', 'Opinios', 'News']; %>
-    <% categories.forEach(cat => { %>
-      <option value="<%= cat %>" <%= post.category === cat ? 'selected' : '' %>><%= cat %></option>
-    <% }) %>
-  </select>
-</div>
+      <div>
+        <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Category</label>
+        <select name="category" required
+          class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white">
+          <% const categories = ['Technology', 'Lifestyle', 'Business', 'Entertainment', 'Sports', 'Politics', 'Opinions', 'News']; %>
+          <% categories.forEach(cat => { %>
+            <option value="<%= cat %>" <%= post.category === cat ? 'selected' : '' %>><%= cat %></option>
+          <% }) %>
+        </select>
+      </div>
 
       <!-- YouTube URL -->
       <div>
@@ -46,19 +44,21 @@
       <!-- Rich Text Editor -->
       <div>
         <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Post Content</label>
-        <div id="editor" class="bg-white dark:bg-gray-900 dark:text-white p-2 border rounded min-h-[200px]">
-          <!-- This will be filled in by Quill -->
-        </div>
+        <div id="editor" class="bg-white dark:bg-gray-900 dark:text-white p-2 border rounded min-h-[200px]"></div>
         <textarea name="content" id="content" hidden></textarea>
       </div>
 
       <!-- Existing Image Preview -->
       <% if (post.media) { %>
-        <div>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Current Image:</p>
+        <figure>
           <img src="<%= post.media %>" alt="Post Image"
             class="w-full h-auto max-h-64 object-contain rounded border" />
-        </div>
+          <% if (post.photoCredit) { %>
+            <figcaption class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              📸 <%= post.photoCredit %>
+            </figcaption>
+          <% } %>
+        </figure>
       <% } %>
 
       <!-- Optional Media Upload -->
@@ -68,21 +68,27 @@
           class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white" />
       </div>
 
+      <!-- Photo Credit -->
+      <div>
+        <label for="photoCredit" class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Photo Credit</label>
+        <input type="text" name="photoCredit" id="photoCredit"
+          class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white"
+          value="<%= post.photoCredit %>" placeholder="e.g. John Doe / Reuters">
+      </div>
+
       <!-- Buttons -->
       <div class="flex justify-between">
-        <a href="/admin"
-          class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition">Cancel</a>
+        <a href="/admin" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition">Cancel</a>
         <button type="submit"
           class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">💾 Save Changes</button>
       </div>
     </form>
   </section>
 
-  <!-- Quill Scripts & Styles -->
+  <!-- Quill Scripts -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
-  <!-- Init Script -->
   <script>
     const quill = new Quill('#editor', {
       theme: 'snow',
@@ -97,15 +103,14 @@
       }
     });
 
-    // Load existing content
-    const initialContent = `<%- post.content.replace(/`/g, '\\`') %>`;
+    const initialContent = `<%- (post.content || '').replace(/`/g, '\\`') %>`;
     quill.root.innerHTML = initialContent;
 
-    // Sync with hidden textarea on form submit
     document.querySelector('form').addEventListener('submit', function () {
       document.getElementById('content').value = quill.root.innerHTML;
     });
   </script>
+
+  <%- include('partials/footer') %>
 </body>
 </html>
- <%- include('partials/footer') %>
