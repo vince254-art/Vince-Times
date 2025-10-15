@@ -42,11 +42,12 @@
                   <img src="<%= post.media %>" alt="<%= post.title %>" class="thumbnail">
                 <% } %>
                 <div class="post-content">
-                  <h2 class="post-title"><%= post.title %></h2>
+                  <h2 class="post-title"><%- post.title %></h2>
                   <span class="post-category"><%= post.category %></span>
                   <p class="post-snippet">
-                    <%= post.content.substring(0, 100) %>...
+  <%- post.content.substring(0, 100) %>...
                   </p>
+
                   <small class="post-date">
                     <%= new Date(post.date).toLocaleDateString() %>
                   </small>
