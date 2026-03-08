@@ -9,6 +9,7 @@ const postSchema = new mongoose.Schema({
   caption: String, // optional: caption for image/video
   photoCredit: String, // optional: credit for photographer
   videoUrl: String,
+  slug: { type: String, required: true, unique: true },
   date: { type: Date, default: Date.now }
 });
 
