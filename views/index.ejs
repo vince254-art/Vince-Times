@@ -37,12 +37,14 @@
         <div class="post-grid">
           <% posts.forEach(post => { %>
             <article class="post-card">
-              <a href="/post/<%= post.id %>">
+            
                 <% if (post.media) { %>
                   <img src="<%= post.media %>" alt="<%= post.title %>" class="thumbnail">
                 <% } %>
                 <div class="post-content">
-                  <h2 class="post-title"><%- post.title %></h2>
+                   <a href="/post/<%= post.slug %>">
+                   <h2><%= post.title %></h2>
+                   </a> 
                   <span class="post-category"><%= post.category %></span>
                   <p class="post-snippet">
   <%- post.content.substring(0, 100) %>...

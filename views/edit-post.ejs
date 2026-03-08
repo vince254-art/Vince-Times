@@ -1,11 +1,11 @@
-<%- include('partials/head') %>
+<%- include('partials/head', { title: 'Edit Post' }) %>
 <body>
   <%- include('partials/navbar') %>
 
   <section class="max-w-3xl mx-auto px-4 py-10">
     <h1 class="text-3xl font-bold mb-6">✏️ Edit Post</h1>
 
-    <form action="/admin/edit/<%= post.id %>" method="POST" enctype="multipart/form-data"
+    <form action="/admin/edit/<%= post.slug %>" method="POST" enctype="multipart/form-data"
       class="bg-white dark:bg-gray-800 p-6 rounded shadow space-y-6">
 
       <!-- Title -->
@@ -17,17 +17,16 @@
 
       <!-- Author -->
       <div>
-        <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200" for="author">Author</label>
-        <input type="text" id="author" name="author" value="<%= post.author || '' %>" placeholder="Author name"
+        <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Author</label>
+        <input type="text" name="author" value="<%= post.author || '' %>" placeholder="Author name"
           class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white" />
       </div>
 
-      <!-- Category Dropdown -->
+      <!-- Category -->
       <div>
         <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Category</label>
-        <select name="category" required
-          class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white">
-          <% const categories = ['Technology', 'Lifestyle', 'Business', 'Entertainment', 'Sports', 'Politics', 'Opinions', 'News']; %>
+        <select name="category" required class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white">
+          <% const categories = ['Technology', 'Lifestyle', 'Business', 'Entertainment', 'Sports', 'Politics', 'Opinion', 'News']; %>
           <% categories.forEach(cat => { %>
             <option value="<%= cat %>" <%= post.category === cat ? 'selected' : '' %>><%= cat %></option>
           <% }) %>
@@ -41,46 +40,40 @@
           class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white" />
       </div>
 
-      <!-- Rich Text Editor -->
+      <!-- Content (Quill) -->
       <div>
         <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Post Content</label>
         <div id="editor" class="bg-white dark:bg-gray-900 dark:text-white p-2 border rounded min-h-[200px]"></div>
         <textarea name="content" id="content" hidden></textarea>
       </div>
 
-      <!-- Existing Image Preview -->
+      <!-- Existing Media -->
       <% if (post.media) { %>
         <figure>
-          <img src="<%= post.media %>" alt="Post Image"
-            class="w-full h-auto max-h-64 object-contain rounded border" />
+          <img src="<%= post.media %>" alt="Post Image" class="w-full h-auto max-h-64 object-contain rounded border" />
           <% if (post.photoCredit) { %>
-            <figcaption class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              📸 <%= post.photoCredit %>
-            </figcaption>
+            <figcaption class="text-sm text-gray-500 dark:text-gray-400 mt-1">📸 <%= post.photoCredit %></figcaption>
           <% } %>
         </figure>
       <% } %>
 
-      <!-- Optional Media Upload -->
+      <!-- Replace Media -->
       <div>
         <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Replace Media (optional)</label>
-        <input type="file" name="media"
-          class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white" />
+        <input type="file" name="media" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white" />
       </div>
 
       <!-- Photo Credit -->
       <div>
-        <label for="photoCredit" class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Photo Credit</label>
-        <input type="text" name="photoCredit" id="photoCredit"
-          class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white"
-          value="<%= post.photoCredit %>" placeholder="e.g. John Doe / Reuters">
+        <label class="block font-medium mb-1 text-gray-800 dark:text-gray-200">Photo Credit</label>
+        <input type="text" name="photoCredit" value="<%= post.photoCredit %>" placeholder="e.g. John Doe / Reuters"
+          class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white" />
       </div>
 
       <!-- Buttons -->
       <div class="flex justify-between">
         <a href="/admin" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition">Cancel</a>
-        <button type="submit"
-          class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">💾 Save Changes</button>
+        <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">💾 Save Changes</button>
       </div>
     </form>
   </section>
@@ -103,7 +96,8 @@
       }
     });
 
-    const initialContent = `<%- (post.content || '').replace(/`/g, '\\`') %>`;
+    // Load existing content safely
+    const initialContent = `<%- post.content.replace(/\\/g, '\\\\').replace(/`/g, '\\`') %>`;
     quill.root.innerHTML = initialContent;
 
     document.querySelector('form').addEventListener('submit', function () {
