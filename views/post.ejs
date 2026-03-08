@@ -17,20 +17,19 @@
   </div>
 
   <!-- 📷 Featured Image -->
- <% if (post.media) { %>
-  <figure class="my-8">
-    <img src="<%= post.media %>" alt="<%= post.title %>" class="post-image">
-    <% if (post.caption || post.photoCredit) { %>
-      <figcaption class="image-caption text-sm text-gray-500 dark:text-gray-400 mt-2">
-        <%= post.caption || '' %>
-        <% if (post.photoCredit) { %>
-          <br><span class="photo-credit italic text-gray-500"><span>📷</span> <%= post.photoCredit %></span>
-        <% } %>
-      </figcaption>
-    <% } %>
-  </figure>
-<% } %>
-
+  <% if (post.media) { %>
+    <figure class="my-8">
+      <img src="<%= post.media %>" alt="<%= post.title %>" class="post-image">
+      <% if (post.caption || post.photoCredit) { %>
+        <figcaption class="image-caption text-sm text-gray-500 dark:text-gray-400 mt-2">
+          <%= post.caption || '' %>
+          <% if (post.photoCredit) { %>
+            <br><span class="photo-credit italic text-gray-500">📷 <%= post.photoCredit %></span>
+          <% } %>
+        </figcaption>
+      <% } %>
+    </figure>
+  <% } %>
 
   <!-- 📺 YouTube Embed -->
   <% if (post.videoUrl) { %>
@@ -50,32 +49,22 @@
       <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">Related Posts📑</h2>
       <div class="grid gap-6">
         <% relatedPosts.forEach(rp => { %>
-          <a href="/post/<%= rp._id %>"
-             class="block rounded-[16px] overflow-hidden shadow-md hover:shadow-xl bg-white dark:bg-gray-800 transition duration-300">
-
+          <a href="/post/<%= rp.slug %>" class="block rounded-[16px] overflow-hidden shadow-md hover:shadow-xl bg-white dark:bg-gray-800 transition duration-300">
             <!-- Thumbnail -->
             <div class="flex justify-center">
               <% if (rp.media) { %>
-                <img src="<%= rp.media %>" alt="<%= rp.title %>"
-                     class="rounded-[16px] object-cover"
-                     style="width:300px; height:200px;" />
+                <img src="<%= rp.media %>" alt="<%= rp.title %>" class="rounded-[16px] object-cover" style="width:300px; height:200px;" />
               <% } else { %>
-                <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 italic rounded-[16px]"
-                     style="width:300px; height:200px;">
+                <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 italic rounded-[16px]" style="width:300px; height:200px;">
                   No image
                 </div>
               <% } %>
             </div>
-
             <!-- Info -->
             <div class="p-4">
               <h3 class="text-lg font-semibold mb-1 text-gray-800 dark:text-white"><%= rp.title %></h3>
-              <p class="text-sm text-gray-600 dark:text-gray-300">
-                <%= rp.content.replace(/<[^>]+>/g, '').slice(0, 100) %>...
-              </p>
-              <div class="mt-2 text-xs text-gray-400">
-                <%= new Date(rp.date).toLocaleDateString() %> • <%= rp.category %>
-              </div>
+              <p class="text-sm text-gray-600 dark:text-gray-300"><%= rp.content.replace(/<[^>]+>/g, '').slice(0, 100) %>...</p>
+              <div class="mt-2 text-xs text-gray-400"><%= new Date(rp.date).toLocaleDateString() %> • <%= rp.category %></div>
             </div>
           </a>
         <% }) %>
@@ -88,8 +77,7 @@
     <h2 class="section-heading">💬 Comments</h2>
 
     <% if (comments && comments.length > 0) { %>
-  <% comments.forEach(function(comment) { %>
-
+      <% comments.forEach(function(comment) { %>
         <div class="comment">
           <div class="comment-header">
             <span class="comment-author"><%= comment.author %></span>
@@ -97,7 +85,6 @@
               <span class="flagged">🚩 Flagged</span>
             <% } %>
           </div>
-
           <div class="comment-text" id="comment-<%= comment._id %>"></div>
 
           <script>
@@ -111,8 +98,8 @@
           </script>
 
           <div class="upvote-section">
-            <button class="upvote-btn" data-post-id="<%= post._id %>" data-comment-id="<%= comment._id %>">⬆ Upvote</button>
-            <span><%= comment.upvotes || 0 %> upvote<%= (comment.upvotes === 1) ? '' : 's' %></span>
+            <button class="upvote-btn" data-post-slug="<%= post.slug %>" data-comment-id="<%= comment._id %>">⬆ Upvote</button>
+            <span><%= comment.upvotes || 0 %> upvote<%= (comment.upvotes === 1 ? '' : 's') %></span>
           </div>
         </div>
       <% }); %>
@@ -121,7 +108,7 @@
     <% } %>
 
     <!-- ✏️ Add Comment Form -->
-    <form action="/post/<%= post._id %>/comment" method="POST" class="comment-form">
+    <form action="/post/<%= post.slug %>/comment" method="POST" class="comment-form">
       <div class="form-group">
         <label for="author">👤 Your Name</label>
         <input type="text" name="author" id="author" required placeholder="e.g. VinceRadio">
@@ -138,53 +125,22 @@
       <h3>🔎 Live Preview</h3>
       <div id="commentPreview" class="comment-preview"></div>
       <div class="my-24"></div>
-
     </div>
 
-
     <!-- 📤 Share Buttons -->
-<div class="mt-16 border-t border-gray-200 dark:border-gray-700 pt-12">
-  <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">
-    Share this post
-  </h3>
+    <div class="mt-16 border-t border-gray-200 dark:border-gray-700 pt-12">
+      <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">Share this post</h3>
+      <div class="flex flex-wrap gap-6 text-2xl share-buttons">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(requestUrl) %>" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600"><i class="fab fa-facebook"></i></a>
+        <a href="https://twitter.com/intent/tweet?url=<%= encodeURIComponent(requestUrl) %>&text=<%= encodeURIComponent(post.title) %>" target="_blank" rel="noopener noreferrer" class="hover:text-gray-700 dark:hover:text-gray-300"><i class="fab fa-x-twitter"></i></a>
+        <a href="https://wa.me/?text=<%= encodeURIComponent(post.title + ' ' + requestUrl) %>" target="_blank" rel="noopener noreferrer" class="hover:text-green-500"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=<%= encodeURIComponent(requestUrl) %>&title=<%= encodeURIComponent(post.title) %>" target="_blank" rel="noopener noreferrer" class="hover:text-blue-700"><i class="fab fa-linkedin"></i></a>
+        <a href="https://t.me/share/url?url=<%= encodeURIComponent(requestUrl) %>&text=<%= encodeURIComponent(post.title) %>" target="_blank" rel="noopener noreferrer" class="hover:text-sky-500"><i class="fab fa-telegram"></i></a>
+        <a href="https://reddit.com/submit?url=<%= encodeURIComponent(requestUrl) %>&title=<%= encodeURIComponent(post.title) %>" target="_blank" rel="noopener noreferrer" class="hover:text-orange-600"><i class="fab fa-reddit"></i></a>
+        <a href="mailto:?subject=<%= encodeURIComponent(post.title) %>&body=<%= encodeURIComponent(requestUrl) %>" class="hover:text-gray-600 dark:hover:text-gray-400"><i class="fas fa-envelope"></i></a>
+      </div>
+    </div>
 
-  <div class="flex flex-wrap gap-6 text-2xl share-buttons">
-    <!-- Facebook -->
-    <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(requestUrl) %>" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600">
-      <i class="fab fa-facebook"></i>
-    </a>
-
-    <!-- Twitter / X -->
-    <a href="https://twitter.com/intent/tweet?url=<%= encodeURIComponent(requestUrl) %>&text=<%= encodeURIComponent(post.title) %>" target="_blank" rel="noopener noreferrer" class="hover:text-gray-700 dark:hover:text-gray-300">
-      <i class="fab fa-x-twitter"></i>
-    </a>
-
-    <!-- WhatsApp -->
-    <a href="https://wa.me/?text=<%= encodeURIComponent(post.title + ' ' + requestUrl) %>" target="_blank" rel="noopener noreferrer" class="hover:text-green-500">
-      <i class="fab fa-whatsapp"></i>
-    </a>
-
-    <!-- LinkedIn -->
-    <a href="https://www.linkedin.com/shareArticle?mini=true&url=<%= encodeURIComponent(requestUrl) %>&title=<%= encodeURIComponent(post.title) %>" target="_blank" rel="noopener noreferrer" class="hover:text-blue-700">
-      <i class="fab fa-linkedin"></i>
-    </a>
-
-    <!-- Telegram -->
-    <a href="https://t.me/share/url?url=<%= encodeURIComponent(requestUrl) %>&text=<%= encodeURIComponent(post.title) %>" target="_blank" rel="noopener noreferrer" class="hover:text-sky-500">
-      <i class="fab fa-telegram"></i>
-    </a>
-
-    <!-- Reddit -->
-    <a href="https://reddit.com/submit?url=<%= encodeURIComponent(requestUrl) %>&title=<%= encodeURIComponent(post.title) %>" target="_blank" rel="noopener noreferrer" class="hover:text-orange-600">
-      <i class="fab fa-reddit"></i>
-    </a>
-
-    <!-- Email -->
-    <a href="mailto:?subject=<%= encodeURIComponent(post.title) %>&body=<%= encodeURIComponent(requestUrl) %>" class="hover:text-gray-600 dark:hover:text-gray-400">
-      <i class="fas fa-envelope"></i>
-    </a>
-  </div>
-</div>
   </section>
 </main>
 
@@ -202,10 +158,10 @@
 
   document.querySelectorAll('.upvote-btn').forEach(button => {
     button.addEventListener('click', async () => {
-      const postId = button.dataset.postId;
+      const postSlug = button.dataset.postSlug;
       const commentId = button.dataset.commentId;
       try {
-        const res = await fetch(`/post/${postId}/comment/${commentId}/upvote`, { method: 'POST' });
+        const res = await fetch(`/post/${postSlug}/comment/${commentId}/upvote`, { method: 'POST' });
         const data = await res.json();
         if (data.success) {
           const countSpan = button.nextElementSibling;
