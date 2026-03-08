@@ -24,7 +24,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
-
+// Privacy routes
+app.get("/privacy", (req, res) => res.render("privacy"));
+app.get("/terms", (req, res) => res.render("terms"));
+app.get("/affiliate", (req, res) => res.render("affiliate"));
 // ✅ Sessions
 app.use(session({
   secret: 'super-secret-key',
