@@ -4,12 +4,11 @@ const path = require('path');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const multer = require('multer');
-const slugify = require('slugify');
 const { storage } = require('./cloudinary');
 const upload = multer({ storage });
 const Post = require('./models/Post');
 const Comment = require('./models/Comment');
-const { SitemapStream, streamToPromise } = require("sitemap");
+const { SitemapStream, streamToPromise } = require('sitemap');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,10 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
-// Privacy routes
-app.get("/privacy", (req, res) => res.render("privacy"));
-app.get("/terms", (req, res) => res.render("terms"));
-app.get("/affiliate", (req, res) => res.render("affiliate"));
+
 // ✅ Sessions
 app.use(session({
   secret: 'super-secret-key',
@@ -48,56 +44,37 @@ app.get('/', async (req, res) => {
     ...(search && { title: { $regex: search, $options: 'i' } }),
     ...(category && { category }),
   };
-  const posts = await Post.find(filter).sort({ date: -1 });
-  res.render('index', {
-    posts,
-    search,
-    category,
-    loggedIn: req.session.loggedIn,
-    title: 'Vince Times',
-  });
+  const posts = await Post.find(filter).sort({ date: -1 }).lean();
+  res.render('index', { posts, search, category, loggedIn: req.session.loggedIn, title: 'Vince Times' });
 });
 
-// ✅ Single Post Page (SEO-friendly slug URL)
+// ✅ Single Post Page by SLUG
 app.get('/post/:slug', async (req, res) => {
   const post = await Post.findOne({ slug: req.params.slug }).lean();
   if (!post) return res.status(404).send('Post not found');
 
-  const comments = await Comment.find({
-    postId: post._id,
-    status: 'approved',
-  }).sort({ _id: -1 }).lean();
+  const comments = await Comment.find({ postId: post._id, status: 'approved' })
+    .sort({ _id: -1 })
+    .lean();
 
-  const relatedPosts = await Post.find({
-    _id: { $ne: post._id },
-    category: post.category,
-  }).limit(3).lean();
+  const relatedPosts = await Post.find({ _id: { $ne: post._id }, category: post.category })
+    .limit(3)
+    .lean();
 
-  const options = {
-    timeZone: 'Africa/Nairobi',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-  };
+  // Format date
+  const options = { timeZone: 'Africa/Nairobi', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
   post.formattedDate = new Date(post.date).toLocaleString('en-KE', options);
 
-  res.render('post', {
-    post,
-    comments,
-    relatedPosts,
-    loggedIn: req.session.loggedIn,
-    title: post.title,
-    requestUrl: req.protocol + '://' + req.get('host') + req.originalUrl,
-  });
+  res.render('post', { post, comments, relatedPosts, loggedIn: req.session.loggedIn, title: post.title, requestUrl: req.protocol + '://' + req.get('host') + req.originalUrl });
 });
 
 // ✅ Add Comment
-app.post('/post/:postId/comment', async (req, res) => {
+app.post('/post/:slug/comment', async (req, res) => {
+  const post = await Post.findOne({ slug: req.params.slug });
+  if (!post) return res.status(404).send('Post not found');
+
   const newComment = new Comment({
-    postId: req.params.postId,
+    postId: post._id,
     author: req.body.author || 'Anonymous',
     text: req.body.text || '',
     status: 'approved',
@@ -105,17 +82,16 @@ app.post('/post/:postId/comment', async (req, res) => {
     flagged: false,
   });
   await newComment.save();
-  res.redirect('/post/' + req.params.postId);
+  res.redirect('/post/' + req.params.slug);
 });
 
-// ✅ Flag Comment
-app.post('/post/:postId/comment/:commentId/flag', async (req, res) => {
+// ✅ Flag & Upvote Comment
+app.post('/post/:slug/comment/:commentId/flag', async (req, res) => {
   await Comment.findByIdAndUpdate(req.params.commentId, { flagged: true });
-  res.redirect('/post/' + req.params.postId);
+  res.redirect('/post/' + req.params.slug);
 });
 
-// ✅ Upvote Comment (AJAX)
-app.post('/post/:postId/comment/:commentId/upvote', async (req, res) => {
+app.post('/post/:slug/comment/:commentId/upvote', async (req, res) => {
   const comment = await Comment.findById(req.params.commentId);
   if (comment) {
     comment.upvotes += 1;
@@ -127,21 +103,16 @@ app.post('/post/:postId/comment/:commentId/upvote', async (req, res) => {
 
 // ✅ Admin Dashboard
 app.get('/admin', requireLogin, async (req, res) => {
-  const posts = await Post.find().sort({ date: -1 });
+  const posts = await Post.find().sort({ date: -1 }).lean();
   res.render('admin', { posts, loggedIn: true, title: 'Admin – Vince Times' });
 });
 
-// ✅ New Post Page
-app.get('/admin/new', requireLogin, (req, res) => {
-  res.render('new-post', { loggedIn: true, title: 'New Post – Vince Times' });
-});
+// ✅ New & Edit Post
+app.get('/admin/new', requireLogin, (req, res) => res.render('new-post', { loggedIn: true, title: 'New Post – Vince Times' }));
 
-// ✅ Create Post (with automatic slug)
 app.post('/admin/new', requireLogin, upload.single('media'), async (req, res) => {
-  const slug = slugify(req.body.title, { lower: true, strict: true });
   const newPost = new Post({
     title: req.body.title,
-    slug,
     category: req.body.category,
     videoUrl: req.body.videoUrl || '',
     content: req.body.content,
@@ -155,20 +126,17 @@ app.post('/admin/new', requireLogin, upload.single('media'), async (req, res) =>
   res.redirect('/admin');
 });
 
-// ✅ Edit Post Page
 app.get('/admin/edit/:id', requireLogin, async (req, res) => {
-  const post = await Post.findById(req.params.id);
+  const post = await Post.findById(req.params.id).lean();
   if (!post) return res.status(404).send('Post not found');
   res.render('edit-post', { post, loggedIn: true, title: 'Edit Post – Vince Times' });
 });
 
-// ✅ Update Post
 app.post('/admin/edit/:id', requireLogin, upload.single('media'), async (req, res) => {
   const post = await Post.findById(req.params.id);
   if (!post) return res.status(404).send('Post not found');
 
   post.title = req.body.title;
-  post.slug = slugify(req.body.title, { lower: true, strict: true }); // update slug
   post.category = req.body.category;
   post.videoUrl = req.body.videoUrl || '';
   post.content = req.body.content;
@@ -207,71 +175,62 @@ app.get('/admin/comments', requireLogin, async (req, res) => {
   });
 });
 
-// ✅ Delete Comment
 app.post('/admin/comments/:id/delete', requireLogin, async (req, res) => {
   await Comment.findByIdAndDelete(req.params.id);
   res.redirect('/admin/comments');
 });
 
-// ✅ Flag Comment (admin side)
 app.post('/admin/comments/:id/flag', requireLogin, async (req, res) => {
   await Comment.findByIdAndUpdate(req.params.id, { flagged: true });
   res.redirect('/admin/comments');
 });
 
-// ✅ Login
-app.get('/login', (req, res) => {
-  res.render('login', { loggedIn: req.session.loggedIn, title: 'Login – Vince Times' });
-});
-
+// ✅ Login / Logout
+app.get('/login', (req, res) => res.render('login', { loggedIn: req.session.loggedIn, title: 'Login – Vince Times' }));
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
   if (username === 'admin' && password === 'password') {
     req.session.loggedIn = true;
     res.redirect('/admin');
-  } else {
-    res.send('Invalid credentials');
-  }
+  } else res.send('Invalid credentials');
 });
+app.get('/logout', (req, res) => { req.session.destroy(() => res.redirect('/')); });
 
-// ✅ Logout
-app.get('/logout', (req, res) => {
-  req.session.destroy(() => res.redirect('/'));
-});
+// ✅ Static Pages
+app.get('/privacy', (req, res) => res.render('privacy', { loggedIn: req.session.loggedIn, title: 'Privacy Policy – Vince Times' }));
+app.get('/terms', (req, res) => res.render('terms', { loggedIn: req.session.loggedIn, title: 'Terms & Conditions – Vince Times' }));
+app.get('/affiliate', (req, res) => res.render('affiliate', { loggedIn: req.session.loggedIn, title: 'Affiliate Disclosure – Vince Times' }));
 
-// ✅ Sitemap (dynamic, slug-based)
-app.get("/sitemap.xml", async (req, res) => {
+// ✅ Sitemap
+app.get('/sitemap.xml', async (req, res) => {
   try {
-    const posts = await Post.find({ slug: { $exists: true, $ne: "" } }).sort({ updatedAt: -1 });
-
-    res.header("Content-Type", "application/xml");
-    let sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-    sitemap += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+    const smStream = new SitemapStream({ hostname: "https://vince-times.onrender.com" });
 
     // Static pages
-    ["/", "/privacy", "/terms"].forEach(path => {
-      sitemap += `  <url>\n    <loc>http://localhost:3000${path}</loc>\n  </url>\n`;
-    });
+    const staticPages = [
+      { loc: "/", changefreq: "daily", priority: 1.0 },
+      { loc: "/privacy", changefreq: "monthly", priority: 0.3 },
+      { loc: "/terms", changefreq: "monthly", priority: 0.3 },
+      { loc: "/affiliate", changefreq: "monthly", priority: 0.3 },
+    ];
+    staticPages.forEach(page => smStream.write(page));
 
-    // Blog posts
-    posts.forEach(post => {
-      sitemap += `  <url>\n`;
-      sitemap += `    <loc>http://localhost:3000/post/${post.slug}</loc>\n`;
-      sitemap += `    <lastmod>${post.updatedAt.toISOString()}</lastmod>\n`;
-      sitemap += `  </url>\n`;
-    });
+    // Posts
+    const posts = await Post.find({ slug: { $exists: true, $ne: "" } });
+    posts.forEach(post => smStream.write({ url: `/post/${post.slug}`, changefreq: 'weekly', priority: 0.8 }));
 
-    sitemap += `</urlset>`;
-    res.send(sitemap);
-
+    smStream.end();
+    const sitemap = await streamToPromise(smStream);
+    res.header('Content-Type', 'application/xml');
+    res.send(sitemap.toString());
   } catch (err) {
-    console.error("Error generating sitemap:", err);
-    res.status(500).send("Server error generating sitemap");
+    console.error('Error generating sitemap:', err);
+    res.status(500).send('Server error generating sitemap');
   }
 });
 
 // ✅ 404 Fallback
 app.use((_, res) => res.status(404).send('Page not found'));
 
-// ✅ Start Server
+// ✅ Start server
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
