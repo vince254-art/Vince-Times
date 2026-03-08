@@ -4,18 +4,18 @@ const path = require('path');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const multer = require('multer');
+const slugify = require('slugify');
 const { storage } = require('./cloudinary');
 const upload = multer({ storage });
 const Post = require('./models/Post');
 const Comment = require('./models/Comment');
+const { SitemapStream, streamToPromise } = require("sitemap");
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ✅ MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
@@ -55,9 +55,9 @@ app.get('/', async (req, res) => {
   });
 });
 
-// ✅ Single Post Page
-app.get('/post/:id', async (req, res) => {
-  const post = await Post.findById(req.params.id).lean();
+// ✅ Single Post Page (SEO-friendly slug URL)
+app.get('/post/:slug', async (req, res) => {
+  const post = await Post.findOne({ slug: req.params.slug }).lean();
   if (!post) return res.status(404).send('Post not found');
 
   const comments = await Comment.find({
@@ -70,7 +70,6 @@ app.get('/post/:id', async (req, res) => {
     category: post.category,
   }).limit(3).lean();
 
-  // ✅ Format date to Nairobi timezone
   const options = {
     timeZone: 'Africa/Nairobi',
     year: 'numeric',
@@ -134,10 +133,12 @@ app.get('/admin/new', requireLogin, (req, res) => {
   res.render('new-post', { loggedIn: true, title: 'New Post – Vince Times' });
 });
 
-// ✅ Create Post
+// ✅ Create Post (with automatic slug)
 app.post('/admin/new', requireLogin, upload.single('media'), async (req, res) => {
+  const slug = slugify(req.body.title, { lower: true, strict: true });
   const newPost = new Post({
     title: req.body.title,
+    slug,
     category: req.body.category,
     videoUrl: req.body.videoUrl || '',
     content: req.body.content,
@@ -145,12 +146,11 @@ app.post('/admin/new', requireLogin, upload.single('media'), async (req, res) =>
     media: req.file ? req.file.path : '',
     author: req.body.author || 'Admin',
     caption: req.body.caption || '',
-    photoCredit: req.body.photoCredit || '', // ✅ added
+    photoCredit: req.body.photoCredit || '',
   });
   await newPost.save();
   res.redirect('/admin');
 });
-
 
 // ✅ Edit Post Page
 app.get('/admin/edit/:id', requireLogin, async (req, res) => {
@@ -165,12 +165,13 @@ app.post('/admin/edit/:id', requireLogin, upload.single('media'), async (req, re
   if (!post) return res.status(404).send('Post not found');
 
   post.title = req.body.title;
+  post.slug = slugify(req.body.title, { lower: true, strict: true }); // update slug
   post.category = req.body.category;
   post.videoUrl = req.body.videoUrl || '';
   post.content = req.body.content;
   post.author = req.body.author?.trim() || post.author;
   post.caption = req.body.caption || '';
-  post.photoCredit = req.body.photoCredit || post.photoCredit; // ✅ added
+  post.photoCredit = req.body.photoCredit || post.photoCredit;
   if (req.file) post.media = req.file.path;
 
   await post.save();
@@ -233,6 +234,37 @@ app.post('/login', (req, res) => {
 // ✅ Logout
 app.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'));
+});
+
+// ✅ Sitemap (dynamic, slug-based)
+app.get("/sitemap.xml", async (req, res) => {
+  try {
+    const posts = await Post.find({ slug: { $exists: true, $ne: "" } }).sort({ updatedAt: -1 });
+
+    res.header("Content-Type", "application/xml");
+    let sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    sitemap += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+
+    // Static pages
+    ["/", "/privacy", "/terms"].forEach(path => {
+      sitemap += `  <url>\n    <loc>http://localhost:3000${path}</loc>\n  </url>\n`;
+    });
+
+    // Blog posts
+    posts.forEach(post => {
+      sitemap += `  <url>\n`;
+      sitemap += `    <loc>http://localhost:3000/post/${post.slug}</loc>\n`;
+      sitemap += `    <lastmod>${post.updatedAt.toISOString()}</lastmod>\n`;
+      sitemap += `  </url>\n`;
+    });
+
+    sitemap += `</urlset>`;
+    res.send(sitemap);
+
+  } catch (err) {
+    console.error("Error generating sitemap:", err);
+    res.status(500).send("Server error generating sitemap");
+  }
 });
 
 // ✅ 404 Fallback
