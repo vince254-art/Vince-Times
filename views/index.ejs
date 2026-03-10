@@ -1,67 +1,128 @@
-<%- include('partials/navbar') %>
-<%- include('partials/head') %>
-<body class="light-mode">
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('partials/head') %>
+  <%- include('partials/navbar') %>
+  <body class="light-mode">
   <%- include('partials/hero') %>
 
+  <!-- Main content -->
   <main class="container fade-in">
 
-    <!-- 🔍 Search -->
-    <form action="/" method="get" class="search-form">
-      <input 
-        type="text" 
-        name="search" 
-        placeholder="Search articles..." 
-        value="<%= search || '' %>"
-        class="search-input"
-      >
-      <button type="submit" class="search-button">Search</button>
-    </form>
+      <!-- 🔍 Search -->
+      <form action="/" method="get" class="search-form">
+        <input type="text" name="search" placeholder="Search articles..." value="<%= search || '' %>" class="search-input">
+        <button type="submit" class="search-button">Search</button>
+      </form>
 
-    <!-- 🏷️ Filter by Category -->
-    <div class="category-filters">
-      <% ['News', 'Politics', 'Sports','Business','Technology', 'Lifestyle', 'Opinion', 'Entertainment'].forEach(cat => { %>
-        <a 
-         href="/?category=<%= cat %>" 
-          class="category-button <%= category === cat ? 'active' : '' %>"
-        >
-          <%= cat %>
-        </a>
+      <!-- 🏷️ Filter by Category -->
+      <div class="category-filters">
+        <% ['News', 'Politics', 'Sports','Business','Technology', 'Lifestyle', 'Opinion', 'Entertainment', 'Education'].forEach(cat => { %>
+          <a 
+          href="/?category=<%= cat %>" class="category-button <%= category === cat ? 'active' : '' %>">
+            <%= cat %>
+          </a>
+        <% }) %>
+      </div>
+
+      <!-- Top Banner Ad (Optional) -->
+      <div style="margin:20px 0; text-align:center;">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-7898439287538275"
+             data-ad-slot="3333333333"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+
+      <!-- 📰 Post Grid -->
+<section id="latest">
+  <% if (posts.length === 0) { %>
+    <p class="no-posts">No posts found.</p>
+  <% } else { %>
+    <div id="postGrid" class="post-grid">
+      <% posts.forEach((post, index) => { %>
+        <article class="post-card">
+          <% if (post.media) { %>
+            <img src="<%= post.media %>" alt="<%= post.title %>" class="thumbnail">
+          <% } %>
+          <div class="post-content">
+            <a href="/post/<%= post.slug %>">
+              <h2><%= post.title %></h2>
+            </a>
+            <span class="post-category text-sm text-gray-600 dark:text-gray-400"><%= post.category %></span>
+            <p class="post-snippet text-sm text-gray-700 dark:text-gray-300 mt-1"><%- post.content.substring(0, 100) %>...</p>
+            <small class="post-date text-xs text-gray-500 dark:text-gray-400"><%= new Date(post.date).toLocaleDateString() %></small>
+          </div>
+        </article>
       <% }) %>
     </div>
+  <% } %>
+</section>
 
-    <!-- 📰 Post Grid -->
-    <section id="latest">
-      <% if (posts.length === 0) { %>
-        <p class="no-posts">No posts found.</p>
-      <% } else { %>
-        <div class="post-grid">
-          <% posts.forEach(post => { %>
-            <article class="post-card">
-            
-                <% if (post.media) { %>
-                  <img src="<%= post.media %>" alt="<%= post.title %>" class="thumbnail">
-                <% } %>
-                <div class="post-content">
-                   <a href="/post/<%= post.slug %>">
-                   <h2><%= post.title %></h2>
-                   </a> 
-                  <span class="post-category"><%= post.category %></span>
-                  <p class="post-snippet">
-  <%- post.content.substring(0, 100) %>...
-                  </p>
+      <!-- Bottom Banner Ad (Optional) -->
+      <div style="margin: 30px 0; text-align:center;">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-7898439287538275"
+             data-ad-slot="5555555555"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
 
-                  <small class="post-date">
-                    <%= new Date(post.date).toLocaleDateString() %>
-                  </small>
-                </div>
-              </a>
-            </article>
-          <% }) %>
-        </div>
-      <% } %>
-    </section>
   </main>
 
+  <!-- Footer -->
   <%- include('partials/footer') %>
+
 </body>
+<style>
+  .adsbygoogle {
+    max-width: 728px;
+    margin: 20px auto;
+  }
+
+  @media (max-width: 768px) {
+    .adsbygoogle {
+      max-width: 100%;
+      margin: 15px 0;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const grid = document.getElementById("postGrid");
+  if (!grid) return;
+
+  const posts = Array.from(grid.children);
+  if (posts.length < 4) return; // skip ads if too few posts
+
+  let interval = 3;
+  if (posts.length > 12) interval = 4;
+  if (posts.length > 20) interval = 5;
+
+  posts.forEach((post, idx) => {
+    if ((idx + 1) % interval === 0) {
+      const adContainer = document.createElement("div");
+      adContainer.style.textAlign = "center";
+      adContainer.style.margin = "20px 0";
+
+      const ad = document.createElement("ins");
+      ad.className = "adsbygoogle";
+      ad.style.display = "block";
+      ad.setAttribute("data-ad-client", "ca-pub-7898439287538275");
+      ad.setAttribute("data-ad-slot", "1234567890");
+      ad.setAttribute("data-ad-format", "fluid");
+      ad.setAttribute("data-ad-layout", "in-article");
+
+      adContainer.appendChild(ad);
+
+      post.after(adContainer);
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    }
+  });
+});
+</script>
 </html>

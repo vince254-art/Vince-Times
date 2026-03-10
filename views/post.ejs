@@ -2,50 +2,58 @@
 <%- include('partials/navbar') %>
 
 <main class="post-container">
-  <!-- 📰 Title -->
-  <h1 class="post-title"><%= post.title %></h1>
 
-  <!-- 📅 Metadata -->
-  <div class="post-meta">
-    <span class="category-badge"><%= post.category %></span>
-    <p>By <span class="font-medium"><%= post.author || 'Vincent Leintoi' %></span></p>
-    <p class="text-sm text-gray-600 dark:text-gray-400">
-      Published on <time datetime="<%= post.date.toISOString() %>"><%= post.formattedDate %></time>
-    </p>
-    <span>•</span>
-    <span><%= Math.ceil((post.content.replace(/<[^>]+>/g, '').split(/\s+/).length || 0) / 200) %> min read</span>
-  </div>
+    <!-- Title -->
+    <h1 class="text-3xl font-bold"><%= post.title %></h1>
 
-  <!-- 📷 Featured Image -->
-  <% if (post.media) { %>
-    <figure class="my-8">
-      <img src="<%= post.media %>" alt="<%= post.title %>" class="post-image">
-      <% if (post.caption || post.photoCredit) { %>
-        <figcaption class="image-caption text-sm text-gray-500 dark:text-gray-400 mt-2">
-          <%= post.caption || '' %>
-          <% if (post.photoCredit) { %>
-            <br><span class="photo-credit italic text-gray-500">📷 <%= post.photoCredit %></span>
-          <% } %>
-        </figcaption>
-      <% } %>
-    </figure>
-  <% } %>
+    <!-- Metadata -->
+ <div class="post-meta">
+  <span class="category-badge"><%= post.category %></span>
 
-  <!-- 📺 YouTube Embed -->
-  <% if (post.videoUrl) { %>
-    <div class="video-wrapper">
-      <iframe src="<%= post.videoUrl %>" frameborder="0" allowfullscreen></iframe>
-    </div>
-  <% } %>
+  <p>
+    By <span class="font-medium"><%= post.author || 'Vincent Leintoi' %></span>
+  </p>
 
-  <!-- ✍️ Content -->
-  <article class="post-content">
-    <%- post.content %>
-  </article>
+  <p class="text-sm text-gray-600 dark:text-gray-400">
+    Published on 
+    <time datetime="<%= new Date(post.date).toLocaleDateString() %>">
+      <%= post.formattedDate %>
+    </time>
+    • 
+    <%= Math.ceil(((post.content || '').replace(/<[^>]+>/g, '').split(/\s+/).length || 0) / 200) %> min read
+  </p>
+</div>
 
-  <!-- 📚 Related Posts -->
+    <!-- Featured Image -->
+    <% if (post.media) { %>
+      <figure class="my-8">
+        <img src="<%= post.media %>" alt="<%= post.title %>" class="post-image">
+        <% if (post.caption || post.photoCredit) { %>
+          <figcaption class="image caption text-sm text-gray-500 dark:text-gray-400 mt-2">
+            <%= post.caption || '' %>
+            <% if (post.photoCredit) { %><br>
+              <br><span class="photo-credit italic text-gray-500"><%= post.photoCredit %></span>
+            <% } %>
+          </figcaption>
+        <% } %>
+      </figure>
+    <% } %>
+
+    <!-- YouTube Video -->
+    <% if (post.videoUrl) { %>
+      <div class="video-wrapper my-6">
+        <iframe src="<%= post.videoUrl %>" frameborder="0" allowfullscreen class="w-full h-64 md:h-96"></iframe>
+      </div>
+    <% } %>
+
+    <!-- content -->
+<article class="post-content" id="articleContent">
+  <%- post.content %>
+</article>
+
+    <!-- 📚 Related Posts -->
   <% if (relatedPosts && relatedPosts.length > 0) { %>
-    <section class="mt-16 border-t pt-10 max-w-[25vw]">
+    <section class="mt-16 border-t pt-10 max-w-4xl">
       <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">Related Posts📑</h2>
       <div class="grid gap-6">
         <% relatedPosts.forEach(rp => { %>
@@ -70,8 +78,8 @@
     </section>
   <% } %>
 
-  <!-- 💬 Comments -->
-  <section id="comments" class="comments-section">
+    <!-- Comments Section -->
+    <section id="comments" class="comments-section">
     <h2 class="section-heading">💬 Comments</h2>
 
     <% if (comments && comments.length > 0) { %>
@@ -94,7 +102,7 @@
               }
             });
           </script>
-
+         
           <div class="upvote-section">
             <button class="upvote-btn" data-post-slug="<%= post.slug %>" data-comment-id="<%= comment._id %>">⬆ Upvote</button>
             <span><%= comment.upvotes || 0 %> upvote<%= (comment.upvotes === 1 ? '' : 's') %></span>
@@ -139,32 +147,94 @@
     </div>
 
   </section>
+
+  <!-- Sidebar -->
+  <aside class="space-y-6">
+    <%- include('partials/sidebar') %>
+  </aside>
+
 </main>
+
+<%- include('partials/footer') %>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
 <script>
+  // Live Markdown preview for comments
   const input = document.getElementById('wysiwyg');
   const preview = document.getElementById('commentPreview');
+
   input?.addEventListener('input', () => {
     preview.innerHTML = DOMPurify.sanitize(marked.parse(input.value));
   });
 
+  // Comment upvotes
   document.querySelectorAll('.upvote-btn').forEach(button => {
     button.addEventListener('click', async () => {
       const postSlug = button.dataset.postSlug;
       const commentId = button.dataset.commentId;
+
       try {
-        const res = await fetch(`/post/${postSlug}/comment/${commentId}/upvote`, { method: 'POST' });
+        const res = await fetch(`/post/${postSlug}/comment/${commentId}/upvote`, {
+          method: 'POST'
+        });
+
         const data = await res.json();
+
         if (data.success) {
-          button.nextElementSibling.textContent = `${data.upvotes} upvote${data.upvotes === 1 ? '' : 's'}`;
+          button.nextElementSibling.textContent =
+            `${data.upvotes} upvote${data.upvotes === 1 ? '' : 's'}`;
         }
+
       } catch (err) {
         console.error('Upvote failed:', err);
       }
     });
   });
 </script>
+ <script>
+document.addEventListener("DOMContentLoaded", () => {
 
-<%- include('partials/footer') %>
+  const article = document.getElementById("articleContent");
+  if (!article) return;
+
+  const paragraphs = article.querySelectorAll("p");
+
+  // Do not show ads if article is too short
+  if (paragraphs.length < 4) return;
+
+  // Decide spacing dynamically
+  let interval = 3;
+
+  if (paragraphs.length > 12) interval = 4;
+  if (paragraphs.length > 20) interval = 5;
+
+  paragraphs.forEach((p, index) => {
+
+    if ((index + 1) % interval === 0) {
+
+      const adContainer = document.createElement("div");
+      adContainer.style.margin = "30px 0";
+      adContainer.style.textAlign = "center";
+
+      const ad = document.createElement("ins");
+
+      ad.className = "adsbygoogle";
+      ad.style.display = "block";
+
+      ad.setAttribute("data-ad-client", "ca-pub-7898439287538275");
+      ad.setAttribute("data-ad-slot", "1234567890");
+      ad.setAttribute("data-ad-format", "fluid");
+      ad.setAttribute("data-ad-layout", "in-article");
+
+      adContainer.appendChild(ad);
+
+      p.after(adContainer);
+
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    }
+
+  });
+
+});
+</script>

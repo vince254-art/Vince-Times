@@ -263,7 +263,39 @@ app.get('/sitemap.xml', async (req, res) => {
     res.status(500).send('Server error generating sitemap');
   }
 });
+app.get('/news-sitemap.xml', async (req, res) => {
+  try {
+    const posts = await Post.find().sort({ createdAt: -1 }).limit(100);
 
+    let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">`;
+
+    posts.forEach(post => {
+      sitemap += `
+<url>
+<loc>https://vince-times.onrender.com/post/${post.slug}</loc>
+<news:news>
+<news:publication>
+<news:name>Vince Times</news:name>
+<news:language>en</news:language>
+</news:publication>
+<news:publication_date>${post.createdAt.toISOString()}</news:publication_date>
+<news:title>${post.title}</news:title>
+</news:news>
+</url>`;
+    });
+
+    sitemap += `</urlset>`;
+
+    res.header('Content-Type', 'application/xml');
+    res.send(sitemap);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error generating sitemap');
+  }
+});
 // ✅ 404 Fallback
 app.use((_, res) => res.status(404).send('Page not found'));
 
