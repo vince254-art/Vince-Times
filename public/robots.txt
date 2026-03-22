@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vince-times.onrender.com/sitemap.xml
