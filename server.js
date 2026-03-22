@@ -24,6 +24,7 @@ app.use(express.json());
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
+
 // ✅ Sessions
 app.use(session({
   secret: 'super-secret-key',
@@ -83,6 +84,10 @@ app.get('/post/:slug', async (req, res) => {
     console.error('Error fetching post:', err);
     res.status(500).send('Server error');
   }
+})
+//ads.txt back up
+  ;app.get('/ads.txt', (req, res) => {
+  res.sendFile(__dirname + '/public/ads.txt');
 });
 
 // ✅ Add Comment (slug-based)
