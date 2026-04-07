@@ -85,10 +85,6 @@ app.get('/post/:slug', async (req, res) => {
     res.status(500).send('Server error');
   }
 })
-//ads.txt back up
-  ;app.get('/ads.txt', (req, res) => {
-  res.sendFile(__dirname + '/public/ads.txt');
-});
 
 // ✅ Add Comment (slug-based)
 app.post('/post/:slug/comment', async (req, res) => {
